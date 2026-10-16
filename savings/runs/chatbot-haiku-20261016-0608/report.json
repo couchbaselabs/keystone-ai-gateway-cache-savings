@@ -1,0 +1,1066 @@
+{
+  "run_id": "chatbot-haiku-20261016-0608",
+  "generated_at": "2026-10-16T19:26:16+00:00",
+  "meta": {
+    "run_id": "chatbot-haiku-20261016-0608",
+    "workload": "chatbot",
+    "model": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "embed_model": "amazon.titan-embed-text-v2:0",
+    "gateway_url": "https://<gateway host not recorded>",
+    "cache_type": "semantic",
+    "requested_expiry_s": 172800,
+    "requested_threshold": null,
+    "applied_threshold": "0.75",
+    "applied_expiry": "48h0m0s",
+    "concurrency": 8,
+    "limit": 20000,
+    "nonce": "49d296b402fc",
+    "created_at": "2026-10-16T06:08:48.774+00:00",
+    "dataset": {
+      "workload": "chatbot",
+      "source": "Bitext customer support (27K, v11)",
+      "seed": 42,
+      "n": 20000,
+      "popularity": {
+        "intent": "Zipf-Mandelbrot s=1.0 q=2.0 over 27 intents",
+        "phrase": "Zipf-Mandelbrot s=1.1 q=5.0 over phrasings within an intent"
+      },
+      "system_prompt": "You are Nova, the customer support assistant for Northwind Outfitters, an online retailer of outdoor clothing and gear that ships to the United States, Canada and the European Union.\n\nStore policies you can rely on:\n- Orders can be cancelled free of charge until they ship, usually within 24 hours of purchase. After shipping, the customer must request a return instead.\n- Returns are accepted within 30 days of delivery for unused items in original packaging. Refunds go back to the original payment method within 5-7 business days after the return is received.\n- Standard shipping takes 3-5 business days, express 1-2 business days. Orders over $75 ship free.\n- Accepted payment methods: Visa, Mastercard, American Express, PayPal, Apple Pay and store gift cards.\n- Invoices are available under Account > Orders and are emailed when an order ships.\n- Customers can change the shipping address until the order ships, from Account > Orders.\n- Account emails, passwords and newsletter preferences are managed under Account > Settings.\n- Human agents are available by chat or phone at 1-800-555-0199, Monday to Friday, 8am-8pm ET.\n\nHow to answer:\n- Be warm, direct and specific. Give step-by-step instructions when the customer has to do something.\n- Never invent order details, tracking numbers or amounts. If you need an order number or other details you don't have, say exactly what the customer should provide or where to find it.\n- Do not promise exceptions to these policies; offer to connect the customer with a human agent instead.\n- Answer in 120 to 200 words. Use short paragraphs or a short numbered list, no headings.",
+      "system_tokens_est": 406,
+      "max_tokens": 400,
+      "stats": {
+        "requests": 20000,
+        "distinct_messages": 8524,
+        "distinct_groups": 27,
+        "exact_repeat_share": 0.5738,
+        "reworded_repeat_share": 0.4249,
+        "user_tokens_est_mean": 10.7
+      }
+    },
+    "status": "complete",
+    "started_at": "2026-10-16T06:08:48.778+00:00",
+    "resumed_at": null,
+    "finished_at": "2026-10-16T06:39:09.955+00:00"
+  },
+  "progress": {
+    "run_id": "chatbot-haiku-20261016-0608",
+    "state": "complete",
+    "total": 20000,
+    "done": 20000,
+    "hits": 18577,
+    "standard": 3184,
+    "semantic": 15393,
+    "errors": 0,
+    "hit_rate": 0.9288,
+    "req_per_s": 10.98,
+    "eta_s": 0,
+    "updated_at": "2026-10-16T06:39:09.956+00:00"
+  },
+  "requests_ok": 20000,
+  "requests_failed": 0,
+  "retried_requests": 0,
+  "checkpoints": {
+    "1000": {
+      "requests": 1000,
+      "hits": 604,
+      "standard_hits": 68,
+      "semantic_hits": 536,
+      "unknown_hits": 0,
+      "misses": 396,
+      "no_cache_header": 0,
+      "hit_rate": 0.604,
+      "standard_hit_rate": 0.068,
+      "semantic_hit_rate": 0.536,
+      "tokens": {
+        "saved_input_total": 252051,
+        "saved_output_total": 110691,
+        "saved_input_per_hit": 417.30298013245033,
+        "saved_output_per_hit": 183.26324503311258,
+        "saved_input_per_standard_hit": 417.6470588235294,
+        "saved_output_per_standard_hit": 189.1764705882353,
+        "saved_input_per_semantic_hit": 417.25932835820896,
+        "saved_output_per_semantic_hit": 182.51305970149255,
+        "billed_input_total": 165128,
+        "billed_output_total": 73816,
+        "miss_input_mean": 416.989898989899,
+        "miss_output_mean": 186.40404040404042,
+        "saved_share": 0.6028759186685414
+      },
+      "embedding": {
+        "tokens_total": 9937,
+        "tokens_per_request": 9.937,
+        "embedded_requests": 932
+      },
+      "latency_ms": {
+        "hit": {
+          "n": 604,
+          "p50": 176.8,
+          "p95": 264.11
+        },
+        "standard_hit": {
+          "n": 68,
+          "p50": 176.89999999999998,
+          "p95": 279.35999999999996
+        },
+        "semantic_hit": {
+          "n": 536,
+          "p50": 176.8,
+          "p95": 263.75
+        },
+        "miss": {
+          "n": 396,
+          "p50": 2567.35,
+          "p95": 3613.675
+        }
+      },
+      "cost_usd": {
+        "without_cache": 1.339714,
+        "llm_with_cache": 0.534208,
+        "embedding": 0.00019874,
+        "with_cache": 0.53440674,
+        "saved": 0.8053072600000001,
+        "saved_share": 0.6011038624661682
+      }
+    },
+    "10000": {
+      "requests": 10000,
+      "hits": 8854,
+      "standard_hits": 1431,
+      "semantic_hits": 7423,
+      "unknown_hits": 0,
+      "misses": 1131,
+      "no_cache_header": 15,
+      "hit_rate": 0.8854,
+      "standard_hit_rate": 0.1431,
+      "semantic_hit_rate": 0.7423,
+      "tokens": {
+        "saved_input_total": 3693657,
+        "saved_output_total": 1633617,
+        "saved_input_per_hit": 417.1738197424893,
+        "saved_output_per_hit": 184.50609893833297,
+        "saved_input_per_standard_hit": 417.3424178895877,
+        "saved_output_per_standard_hit": 187.0398322851153,
+        "saved_input_per_semantic_hit": 417.1413175266065,
+        "saved_output_per_semantic_hit": 184.01764785127307,
+        "billed_input_total": 477389,
+        "billed_output_total": 211995,
+        "miss_input_mean": 416.57294429708224,
+        "miss_output_mean": 185.03006189213085,
+        "saved_share": 0.8854207767833904
+      },
+      "embedding": {
+        "tokens_total": 91822,
+        "tokens_per_request": 9.1822,
+        "embedded_requests": 8569
+      },
+      "latency_ms": {
+        "hit": {
+          "n": 8854,
+          "p50": 189.3,
+          "p95": 353.55500000000046
+        },
+        "standard_hit": {
+          "n": 1431,
+          "p50": 183.7,
+          "p95": 362.3
+        },
+        "semantic_hit": {
+          "n": 7423,
+          "p50": 190.1,
+          "p95": 350.62999999999937
+        },
+        "miss": {
+          "n": 1131,
+          "p50": 2515.0,
+          "p95": 3759.4
+        }
+      },
+      "cost_usd": {
+        "without_cache": 13.399106,
+        "llm_with_cache": 1.537364,
+        "embedding": 0.00183644,
+        "with_cache": 1.53920044,
+        "saved": 11.85990556,
+        "saved_share": 0.885126631582734
+      }
+    },
+    "20000": {
+      "requests": 20000,
+      "hits": 18577,
+      "standard_hits": 3184,
+      "semantic_hits": 15393,
+      "unknown_hits": 0,
+      "misses": 1392,
+      "no_cache_header": 31,
+      "hit_rate": 0.92885,
+      "standard_hit_rate": 0.1592,
+      "semantic_hit_rate": 0.76965,
+      "tokens": {
+        "saved_input_total": 7749018,
+        "saved_output_total": 3436412,
+        "saved_input_per_hit": 417.12967648167086,
+        "saved_output_per_hit": 184.9820746083867,
+        "saved_input_per_standard_hit": 417.16896984924625,
+        "saved_output_per_standard_hit": 185.2660175879397,
+        "saved_input_per_semantic_hit": 417.121548755928,
+        "saved_output_per_semantic_hit": 184.9233417787306,
+        "billed_input_total": 592654,
+        "billed_output_total": 263072,
+        "miss_input_mean": 416.4719827586207,
+        "miss_output_mean": 184.95977011494253,
+        "saved_share": 0.9289332353139516
+      },
+      "embedding": {
+        "tokens_total": 180439,
+        "tokens_per_request": 9.02195,
+        "embedded_requests": 16816
+      },
+      "latency_ms": {
+        "hit": {
+          "n": 18577,
+          "p50": 187.2,
+          "p95": 353.32000000000005
+        },
+        "standard_hit": {
+          "n": 3184,
+          "p50": 182.4,
+          "p95": 359.8499999999999
+        },
+        "semantic_hit": {
+          "n": 15393,
+          "p50": 187.9,
+          "p95": 351.73999999999995
+        },
+        "miss": {
+          "n": 1392,
+          "p50": 2532.25,
+          "p95": 3843.3500000000004
+        }
+      },
+      "cost_usd": {
+        "without_cache": 26.839092,
+        "llm_with_cache": 1.908014,
+        "embedding": 0.0036087800000000002,
+        "with_cache": 1.91162278,
+        "saved": 24.92746922,
+        "saved_share": 0.928774685075039
+      }
+    }
+  },
+  "segments": [
+    {
+      "from": 1,
+      "to": 1000,
+      "requests": 1000,
+      "hit_rate": 0.604,
+      "semantic_hit_rate": 0.536
+    },
+    {
+      "from": 1001,
+      "to": 10000,
+      "requests": 9000,
+      "hit_rate": 0.9166666666666666,
+      "semantic_hit_rate": 0.7652222222222222
+    },
+    {
+      "from": 10001,
+      "to": 20000,
+      "requests": 10000,
+      "hit_rate": 0.9723,
+      "semantic_hit_rate": 0.797
+    }
+  ],
+  "curve": [
+    {
+      "end": 250,
+      "hit_rate": 0.32,
+      "semantic_rate": 0.296
+    },
+    {
+      "end": 500,
+      "hit_rate": 0.672,
+      "semantic_rate": 0.588
+    },
+    {
+      "end": 750,
+      "hit_rate": 0.728,
+      "semantic_rate": 0.628
+    },
+    {
+      "end": 1000,
+      "hit_rate": 0.696,
+      "semantic_rate": 0.632
+    },
+    {
+      "end": 1250,
+      "hit_rate": 0.76,
+      "semantic_rate": 0.664
+    },
+    {
+      "end": 1500,
+      "hit_rate": 0.8,
+      "semantic_rate": 0.692
+    },
+    {
+      "end": 1750,
+      "hit_rate": 0.768,
+      "semantic_rate": 0.636
+    },
+    {
+      "end": 2000,
+      "hit_rate": 0.816,
+      "semantic_rate": 0.688
+    },
+    {
+      "end": 2250,
+      "hit_rate": 0.892,
+      "semantic_rate": 0.772
+    },
+    {
+      "end": 2500,
+      "hit_rate": 0.844,
+      "semantic_rate": 0.736
+    },
+    {
+      "end": 2750,
+      "hit_rate": 0.928,
+      "semantic_rate": 0.788
+    },
+    {
+      "end": 3000,
+      "hit_rate": 0.912,
+      "semantic_rate": 0.708
+    },
+    {
+      "end": 3250,
+      "hit_rate": 0.92,
+      "semantic_rate": 0.76
+    },
+    {
+      "end": 3500,
+      "hit_rate": 0.92,
+      "semantic_rate": 0.752
+    },
+    {
+      "end": 3750,
+      "hit_rate": 0.884,
+      "semantic_rate": 0.76
+    },
+    {
+      "end": 4000,
+      "hit_rate": 0.936,
+      "semantic_rate": 0.828
+    },
+    {
+      "end": 4250,
+      "hit_rate": 0.924,
+      "semantic_rate": 0.76
+    },
+    {
+      "end": 4500,
+      "hit_rate": 0.912,
+      "semantic_rate": 0.772
+    },
+    {
+      "end": 4750,
+      "hit_rate": 0.928,
+      "semantic_rate": 0.764
+    },
+    {
+      "end": 5000,
+      "hit_rate": 0.908,
+      "semantic_rate": 0.724
+    },
+    {
+      "end": 5250,
+      "hit_rate": 0.924,
+      "semantic_rate": 0.776
+    },
+    {
+      "end": 5500,
+      "hit_rate": 0.96,
+      "semantic_rate": 0.78
+    },
+    {
+      "end": 5750,
+      "hit_rate": 0.912,
+      "semantic_rate": 0.744
+    },
+    {
+      "end": 6000,
+      "hit_rate": 0.952,
+      "semantic_rate": 0.808
+    },
+    {
+      "end": 6250,
+      "hit_rate": 0.924,
+      "semantic_rate": 0.76
+    },
+    {
+      "end": 6500,
+      "hit_rate": 0.932,
+      "semantic_rate": 0.776
+    },
+    {
+      "end": 6750,
+      "hit_rate": 0.964,
+      "semantic_rate": 0.864
+    },
+    {
+      "end": 7000,
+      "hit_rate": 0.924,
+      "semantic_rate": 0.76
+    },
+    {
+      "end": 7250,
+      "hit_rate": 0.944,
+      "semantic_rate": 0.808
+    },
+    {
+      "end": 7500,
+      "hit_rate": 0.944,
+      "semantic_rate": 0.788
+    },
+    {
+      "end": 7750,
+      "hit_rate": 0.94,
+      "semantic_rate": 0.8
+    },
+    {
+      "end": 8000,
+      "hit_rate": 0.948,
+      "semantic_rate": 0.8
+    },
+    {
+      "end": 8250,
+      "hit_rate": 0.948,
+      "semantic_rate": 0.776
+    },
+    {
+      "end": 8500,
+      "hit_rate": 0.972,
+      "semantic_rate": 0.792
+    },
+    {
+      "end": 8750,
+      "hit_rate": 0.956,
+      "semantic_rate": 0.744
+    },
+    {
+      "end": 9000,
+      "hit_rate": 0.952,
+      "semantic_rate": 0.756
+    },
+    {
+      "end": 9250,
+      "hit_rate": 0.964,
+      "semantic_rate": 0.804
+    },
+    {
+      "end": 9500,
+      "hit_rate": 0.964,
+      "semantic_rate": 0.796
+    },
+    {
+      "end": 9750,
+      "hit_rate": 0.948,
+      "semantic_rate": 0.788
+    },
+    {
+      "end": 10000,
+      "hit_rate": 0.976,
+      "semantic_rate": 0.824
+    },
+    {
+      "end": 10250,
+      "hit_rate": 0.968,
+      "semantic_rate": 0.804
+    },
+    {
+      "end": 10500,
+      "hit_rate": 0.968,
+      "semantic_rate": 0.76
+    },
+    {
+      "end": 10750,
+      "hit_rate": 0.96,
+      "semantic_rate": 0.82
+    },
+    {
+      "end": 11000,
+      "hit_rate": 0.984,
+      "semantic_rate": 0.872
+    },
+    {
+      "end": 11250,
+      "hit_rate": 0.968,
+      "semantic_rate": 0.796
+    },
+    {
+      "end": 11500,
+      "hit_rate": 0.948,
+      "semantic_rate": 0.804
+    },
+    {
+      "end": 11750,
+      "hit_rate": 0.976,
+      "semantic_rate": 0.788
+    },
+    {
+      "end": 12000,
+      "hit_rate": 0.984,
+      "semantic_rate": 0.804
+    },
+    {
+      "end": 12250,
+      "hit_rate": 0.964,
+      "semantic_rate": 0.8
+    },
+    {
+      "end": 12500,
+      "hit_rate": 0.972,
+      "semantic_rate": 0.816
+    },
+    {
+      "end": 12750,
+      "hit_rate": 0.98,
+      "semantic_rate": 0.816
+    },
+    {
+      "end": 13000,
+      "hit_rate": 0.972,
+      "semantic_rate": 0.784
+    },
+    {
+      "end": 13250,
+      "hit_rate": 0.912,
+      "semantic_rate": 0.724
+    },
+    {
+      "end": 13500,
+      "hit_rate": 0.98,
+      "semantic_rate": 0.788
+    },
+    {
+      "end": 13750,
+      "hit_rate": 0.956,
+      "semantic_rate": 0.784
+    },
+    {
+      "end": 14000,
+      "hit_rate": 0.98,
+      "semantic_rate": 0.816
+    },
+    {
+      "end": 14250,
+      "hit_rate": 0.976,
+      "semantic_rate": 0.764
+    },
+    {
+      "end": 14500,
+      "hit_rate": 0.972,
+      "semantic_rate": 0.764
+    },
+    {
+      "end": 14750,
+      "hit_rate": 0.98,
+      "semantic_rate": 0.768
+    },
+    {
+      "end": 15000,
+      "hit_rate": 0.984,
+      "semantic_rate": 0.768
+    },
+    {
+      "end": 15250,
+      "hit_rate": 0.972,
+      "semantic_rate": 0.808
+    },
+    {
+      "end": 15500,
+      "hit_rate": 0.972,
+      "semantic_rate": 0.784
+    },
+    {
+      "end": 15750,
+      "hit_rate": 0.984,
+      "semantic_rate": 0.788
+    },
+    {
+      "end": 16000,
+      "hit_rate": 0.96,
+      "semantic_rate": 0.824
+    },
+    {
+      "end": 16250,
+      "hit_rate": 0.964,
+      "semantic_rate": 0.8
+    },
+    {
+      "end": 16500,
+      "hit_rate": 0.976,
+      "semantic_rate": 0.784
+    },
+    {
+      "end": 16750,
+      "hit_rate": 0.984,
+      "semantic_rate": 0.82
+    },
+    {
+      "end": 17000,
+      "hit_rate": 0.968,
+      "semantic_rate": 0.776
+    },
+    {
+      "end": 17250,
+      "hit_rate": 0.96,
+      "semantic_rate": 0.816
+    },
+    {
+      "end": 17500,
+      "hit_rate": 0.956,
+      "semantic_rate": 0.808
+    },
+    {
+      "end": 17750,
+      "hit_rate": 0.992,
+      "semantic_rate": 0.804
+    },
+    {
+      "end": 18000,
+      "hit_rate": 0.98,
+      "semantic_rate": 0.796
+    },
+    {
+      "end": 18250,
+      "hit_rate": 0.988,
+      "semantic_rate": 0.796
+    },
+    {
+      "end": 18500,
+      "hit_rate": 0.968,
+      "semantic_rate": 0.776
+    },
+    {
+      "end": 18750,
+      "hit_rate": 0.976,
+      "semantic_rate": 0.784
+    },
+    {
+      "end": 19000,
+      "hit_rate": 0.976,
+      "semantic_rate": 0.832
+    },
+    {
+      "end": 19250,
+      "hit_rate": 0.976,
+      "semantic_rate": 0.788
+    },
+    {
+      "end": 19500,
+      "hit_rate": 0.988,
+      "semantic_rate": 0.828
+    },
+    {
+      "end": 19750,
+      "hit_rate": 0.984,
+      "semantic_rate": 0.828
+    },
+    {
+      "end": 20000,
+      "hit_rate": 0.984,
+      "semantic_rate": 0.8
+    }
+  ],
+  "thresholds": {
+    "thresholds": [
+      0.7,
+      0.72,
+      0.74,
+      0.75,
+      0.76,
+      0.78,
+      0.8,
+      0.82,
+      0.84,
+      0.86,
+      0.88,
+      0.9,
+      0.92,
+      0.94,
+      0.96,
+      0.98
+    ],
+    "checkpoints": {
+      "1000": [
+        {
+          "threshold": 0.7,
+          "hit_rate": 0.646,
+          "semantic_rate": 0.577
+        },
+        {
+          "threshold": 0.72,
+          "hit_rate": 0.61,
+          "semantic_rate": 0.534
+        },
+        {
+          "threshold": 0.74,
+          "hit_rate": 0.58,
+          "semantic_rate": 0.506
+        },
+        {
+          "threshold": 0.75,
+          "hit_rate": 0.569,
+          "semantic_rate": 0.489
+        },
+        {
+          "threshold": 0.76,
+          "hit_rate": 0.551,
+          "semantic_rate": 0.47
+        },
+        {
+          "threshold": 0.78,
+          "hit_rate": 0.514,
+          "semantic_rate": 0.421
+        },
+        {
+          "threshold": 0.8,
+          "hit_rate": 0.484,
+          "semantic_rate": 0.387
+        },
+        {
+          "threshold": 0.82,
+          "hit_rate": 0.438,
+          "semantic_rate": 0.331
+        },
+        {
+          "threshold": 0.84,
+          "hit_rate": 0.396,
+          "semantic_rate": 0.281
+        },
+        {
+          "threshold": 0.86,
+          "hit_rate": 0.349,
+          "semantic_rate": 0.225
+        },
+        {
+          "threshold": 0.88,
+          "hit_rate": 0.305,
+          "semantic_rate": 0.175
+        },
+        {
+          "threshold": 0.9,
+          "hit_rate": 0.274,
+          "semantic_rate": 0.137
+        },
+        {
+          "threshold": 0.92,
+          "hit_rate": 0.231,
+          "semantic_rate": 0.089
+        },
+        {
+          "threshold": 0.94,
+          "hit_rate": 0.207,
+          "semantic_rate": 0.064
+        },
+        {
+          "threshold": 0.96,
+          "hit_rate": 0.177,
+          "semantic_rate": 0.03
+        },
+        {
+          "threshold": 0.98,
+          "hit_rate": 0.164,
+          "semantic_rate": 0.017
+        }
+      ],
+      "10000": [
+        {
+          "threshold": 0.7,
+          "hit_rate": 0.8948,
+          "semantic_rate": 0.7595
+        },
+        {
+          "threshold": 0.72,
+          "hit_rate": 0.881,
+          "semantic_rate": 0.7319
+        },
+        {
+          "threshold": 0.74,
+          "hit_rate": 0.8664,
+          "semantic_rate": 0.7037
+        },
+        {
+          "threshold": 0.75,
+          "hit_rate": 0.8586,
+          "semantic_rate": 0.6838
+        },
+        {
+          "threshold": 0.76,
+          "hit_rate": 0.8507,
+          "semantic_rate": 0.6746
+        },
+        {
+          "threshold": 0.78,
+          "hit_rate": 0.8322,
+          "semantic_rate": 0.6363
+        },
+        {
+          "threshold": 0.8,
+          "hit_rate": 0.8111,
+          "semantic_rate": 0.5934
+        },
+        {
+          "threshold": 0.82,
+          "hit_rate": 0.7884,
+          "semantic_rate": 0.5471
+        },
+        {
+          "threshold": 0.84,
+          "hit_rate": 0.7588,
+          "semantic_rate": 0.492
+        },
+        {
+          "threshold": 0.86,
+          "hit_rate": 0.7305,
+          "semantic_rate": 0.4308
+        },
+        {
+          "threshold": 0.88,
+          "hit_rate": 0.6981,
+          "semantic_rate": 0.3655
+        },
+        {
+          "threshold": 0.9,
+          "hit_rate": 0.658,
+          "semantic_rate": 0.2931
+        },
+        {
+          "threshold": 0.92,
+          "hit_rate": 0.6167,
+          "semantic_rate": 0.22
+        },
+        {
+          "threshold": 0.94,
+          "hit_rate": 0.5748,
+          "semantic_rate": 0.1534
+        },
+        {
+          "threshold": 0.96,
+          "hit_rate": 0.5279,
+          "semantic_rate": 0.0825
+        },
+        {
+          "threshold": 0.98,
+          "hit_rate": 0.494,
+          "semantic_rate": 0.0318
+        }
+      ],
+      "20000": [
+        {
+          "threshold": 0.7,
+          "hit_rate": 0.93365,
+          "semantic_rate": 0.78455
+        },
+        {
+          "threshold": 0.72,
+          "hit_rate": 0.9247,
+          "semantic_rate": 0.7605
+        },
+        {
+          "threshold": 0.74,
+          "hit_rate": 0.91465,
+          "semantic_rate": 0.73545
+        },
+        {
+          "threshold": 0.75,
+          "hit_rate": 0.9089,
+          "semantic_rate": 0.71575
+        },
+        {
+          "threshold": 0.76,
+          "hit_rate": 0.90315,
+          "semantic_rate": 0.7081
+        },
+        {
+          "threshold": 0.78,
+          "hit_rate": 0.88905,
+          "semantic_rate": 0.6689
+        },
+        {
+          "threshold": 0.8,
+          "hit_rate": 0.87355,
+          "semantic_rate": 0.62875
+        },
+        {
+          "threshold": 0.82,
+          "hit_rate": 0.8565,
+          "semantic_rate": 0.5849
+        },
+        {
+          "threshold": 0.84,
+          "hit_rate": 0.83395,
+          "semantic_rate": 0.5295
+        },
+        {
+          "threshold": 0.86,
+          "hit_rate": 0.8117,
+          "semantic_rate": 0.4713
+        },
+        {
+          "threshold": 0.88,
+          "hit_rate": 0.7845,
+          "semantic_rate": 0.40605
+        },
+        {
+          "threshold": 0.9,
+          "hit_rate": 0.7527,
+          "semantic_rate": 0.33355
+        },
+        {
+          "threshold": 0.92,
+          "hit_rate": 0.71715,
+          "semantic_rate": 0.2558
+        },
+        {
+          "threshold": 0.94,
+          "hit_rate": 0.67915,
+          "semantic_rate": 0.18335
+        },
+        {
+          "threshold": 0.96,
+          "hit_rate": 0.63495,
+          "semantic_rate": 0.1039
+        },
+        {
+          "threshold": 0.98,
+          "hit_rate": 0.59885,
+          "semantic_rate": 0.0412
+        }
+      ]
+    }
+  },
+  "replay_check": {
+    "threshold": 0.75,
+    "replayed_hit_rate": 0.9089,
+    "actual_hit_rate": 0.92885
+  },
+  "shadow_agreement": {
+    "both_hit": 12227,
+    "gateway_only": 3166,
+    "shadow_only": 136,
+    "both_miss": 1279
+  },
+  "score_calibration": {
+    "pairs": 15393,
+    "mean_gateway": 0.9496329847401612,
+    "mean_cosine": 0.7833659694925941,
+    "mean_abs_diff": 0.1673761071437734,
+    "max_abs_diff": 0.6587170362472534,
+    "correlation": 0.19717175684398863
+  },
+  "semantic_score": {
+    "min": 0.7502163052558899,
+    "p50": 1.0,
+    "max": 1.0000004768371582
+  },
+  "wrong_hits": {
+    "sampled": 100,
+    "wrong": 11,
+    "unsure": 0,
+    "wrong_rate": 0.11,
+    "judge_wrong": 11,
+    "human_reviewed": 0,
+    "judge_model": "global.anthropic.claude-sonnet-4-6",
+    "examples": [
+      {
+        "seq": 1378,
+        "question": "where could i check order 10987 fucking curent status",
+        "matched_question": "I'd like information about changing order 10987",
+        "score": 0.8602425456047058,
+        "reason": "The user asked to check the current status of order 10987, but the cached answer addresses how to change or modify the order, not how to track or view its status.",
+        "final": "wrong"
+      },
+      {
+        "seq": 1989,
+        "question": "help recovering my profile access key",
+        "matched_question": "ineed help to restore the access key of my account",
+        "score": 0.7668690085411072,
+        "reason": "The question asks about recovering a 'profile access key' (likely an API key or similar credential), but the answer addresses password reset, which is a different type of account access issue.",
+        "final": "wrong"
+      },
+      {
+        "seq": 5222,
+        "question": "what do I have to do to create a standard account?",
+        "matched_question": "i have a problem with creating a Standard account",
+        "score": 1.0,
+        "reason": "The question asks how to create a standard account (steps/instructions), but the cached answer assumes the user is having a problem with account creation and asks troubleshooting questions instead of providing the actual steps.",
+        "final": "wrong"
+      },
+      {
+        "seq": 10884,
+        "question": "i acnt see purchase 12045 status",
+        "matched_question": "I need help with updating order 12045",
+        "score": 1.0,
+        "reason": "The user asked to check the status/visibility of purchase 12045, but the cached answer is about updating/modifying an order, which is a completely different need.",
+        "final": "wrong"
+      },
+      {
+        "seq": 11993,
+        "question": "i do not know how i can see order 10452 current satus",
+        "matched_question": "I'd like information about changing order 10987",
+        "score": 0.827498197555542,
+        "reason": "The user wants to check the status of order 10452, but the cached answer is about changing order 10987 and provides no information about how to view order status.",
+        "final": "wrong"
+      },
+      {
+        "seq": 12105,
+        "question": "what do I have to do to download the invoice #00108?",
+        "matched_question": "i dont know what i need  to do to download my bill #37777",
+        "score": 0.9669263362884521,
+        "reason": "The answer references order #37777 specifically instead of invoice #00108, which could confuse the customer looking for a different invoice.",
+        "final": "wrong"
+      },
+      {
+        "seq": 13579,
+        "question": "wanna see pjrchase 11871 damn current status",
+        "matched_question": "wanna see pjrchase 11230 damn current status",
+        "score": 0.7935463786125183,
+        "reason": "The answer references order 11230 throughout, but the customer is asking about order 11871, making the order number information incorrect for this question.",
+        "final": "wrong"
+      },
+      {
+        "seq": 15088,
+        "question": "how to use the standard account?",
+        "matched_question": "i have a problem with creating a Standard account",
+        "score": 0.9888060688972473,
+        "reason": "The question asks how to use a standard account, but the cached answer addresses troubleshooting problems with creating an account, which is a completely different need.",
+        "final": "wrong"
+      },
+      {
+        "seq": 16741,
+        "question": "i have got to remove an item from order 11230 help me",
+        "matched_question": "i cannot remove some fucking items from order 13377",
+        "score": 0.8068138957023621,
+        "reason": "The answer references order 13377 throughout, but the customer is asking about order 11230, which is a different order number and could cause confusion or lead the customer to look at the wrong order.",
+        "final": "wrong"
+      },
+      {
+        "seq": 17703,
+        "question": "would it be possible toplace a fucking order from Seattle",
+        "matched_question": "is it possible to order from Denver ?",
+        "score": 1.0,
+        "reason": "The answer confirms Denver/Colorado is in the shipping area, but does not address whether Seattle/Washington is eligible, and a customer from Seattle would be misinformed by the Denver-specific confirmation.",
+        "final": "wrong"
+      },
+      {
+        "seq": 18350,
+        "question": "i expect an rebate of CA$$15.50",
+        "matched_question": "I am waiting for a rebate of CA$$89",
+        "score": 0.8838155269622803,
+        "reason": "The cached answer references the wrong rebate amount (CA$89 instead of CA$15.50), which would confuse the customer and undermine trust.",
+        "final": "wrong"
+      }
+    ]
+  }
+}

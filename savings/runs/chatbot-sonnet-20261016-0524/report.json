@@ -1,0 +1,271 @@
+{
+  "run_id": "chatbot-sonnet-20261016-0524",
+  "generated_at": "2026-10-16T19:26:19+00:00",
+  "meta": {
+    "run_id": "chatbot-sonnet-20261016-0524",
+    "workload": "chatbot",
+    "model": "global.amazon.nova-2-lite-v1:0",
+    "embed_model": "amazon.titan-embed-text-v2:0",
+    "gateway_url": "https://<gateway host not recorded>",
+    "cache_type": "semantic",
+    "requested_expiry_s": 172800,
+    "requested_threshold": null,
+    "applied_threshold": "0.75",
+    "applied_expiry": "48h0m0s",
+    "concurrency": 8,
+    "limit": 50,
+    "nonce": "7a3e9f43d05f",
+    "created_at": "2026-10-16T05:24:14.066+00:00",
+    "dataset": {
+      "workload": "chatbot",
+      "source": "Bitext customer support (27K, v11)",
+      "seed": 42,
+      "n": 20000,
+      "popularity": {
+        "intent": "Zipf-Mandelbrot s=1.0 q=2.0 over 27 intents",
+        "phrase": "Zipf-Mandelbrot s=1.1 q=5.0 over phrasings within an intent"
+      },
+      "system_prompt": "You are Nova, the customer support assistant for Northwind Outfitters, an online retailer of outdoor clothing and gear that ships to the United States, Canada and the European Union.\n\nStore policies you can rely on:\n- Orders can be cancelled free of charge until they ship, usually within 24 hours of purchase. After shipping, the customer must request a return instead.\n- Returns are accepted within 30 days of delivery for unused items in original packaging. Refunds go back to the original payment method within 5-7 business days after the return is received.\n- Standard shipping takes 3-5 business days, express 1-2 business days. Orders over $75 ship free.\n- Accepted payment methods: Visa, Mastercard, American Express, PayPal, Apple Pay and store gift cards.\n- Invoices are available under Account > Orders and are emailed when an order ships.\n- Customers can change the shipping address until the order ships, from Account > Orders.\n- Account emails, passwords and newsletter preferences are managed under Account > Settings.\n- Human agents are available by chat or phone at 1-800-555-0199, Monday to Friday, 8am-8pm ET.\n\nHow to answer:\n- Be warm, direct and specific. Give step-by-step instructions when the customer has to do something.\n- Never invent order details, tracking numbers or amounts. If you need an order number or other details you don't have, say exactly what the customer should provide or where to find it.\n- Do not promise exceptions to these policies; offer to connect the customer with a human agent instead.\n- Answer in 120 to 200 words. Use short paragraphs or a short numbered list, no headings.",
+      "system_tokens_est": 406,
+      "max_tokens": 400,
+      "stats": {
+        "requests": 20000,
+        "distinct_messages": 8524,
+        "distinct_groups": 27,
+        "exact_repeat_share": 0.5738,
+        "reworded_repeat_share": 0.4249,
+        "user_tokens_est_mean": 10.7
+      }
+    },
+    "status": "complete",
+    "started_at": "2026-10-16T05:24:14.130+00:00",
+    "resumed_at": null,
+    "finished_at": "2026-10-16T05:24:26.345+00:00"
+  },
+  "progress": {
+    "run_id": "chatbot-sonnet-20261016-0524",
+    "state": "complete",
+    "total": 50,
+    "done": 50,
+    "hits": 5,
+    "standard": 0,
+    "semantic": 5,
+    "errors": 0,
+    "hit_rate": 0.1,
+    "req_per_s": 4.09,
+    "eta_s": 0,
+    "updated_at": "2026-10-16T05:24:26.346+00:00"
+  },
+  "requests_ok": 50,
+  "requests_failed": 0,
+  "retried_requests": 0,
+  "checkpoints": {
+    "50": {
+      "requests": 50,
+      "hits": 5,
+      "standard_hits": 0,
+      "semantic_hits": 5,
+      "unknown_hits": 0,
+      "misses": 45,
+      "no_cache_header": 0,
+      "hit_rate": 0.1,
+      "standard_hit_rate": 0.0,
+      "semantic_hit_rate": 0.1,
+      "tokens": {
+        "saved_input_total": 2074,
+        "saved_output_total": 862,
+        "saved_input_per_hit": 414.8,
+        "saved_output_per_hit": 172.4,
+        "saved_input_per_standard_hit": null,
+        "saved_output_per_standard_hit": null,
+        "saved_input_per_semantic_hit": 414.8,
+        "saved_output_per_semantic_hit": 172.4,
+        "billed_input_total": 18642,
+        "billed_output_total": 8097,
+        "miss_input_mean": 414.26666666666665,
+        "miss_output_mean": 179.93333333333334,
+        "saved_share": 0.09893850042123
+      },
+      "embedding": {
+        "tokens_total": 520,
+        "tokens_per_request": 10.4,
+        "embedded_requests": 50
+      },
+      "latency_ms": {
+        "hit": {
+          "n": 5,
+          "p50": 194.9,
+          "p95": 240.67999999999998
+        },
+        "standard_hit": {
+          "n": 0,
+          "p50": null,
+          "p95": null
+        },
+        "semantic_hit": {
+          "n": 5,
+          "p50": 194.9,
+          "p95": 240.67999999999998
+        },
+        "miss": {
+          "n": 45,
+          "p50": 1484.9,
+          "p95": 1716.84
+        }
+      },
+      "cost_usd": {
+        "without_cache": 0.0,
+        "llm_with_cache": 0.0,
+        "embedding": 1.04e-05,
+        "with_cache": 1.04e-05,
+        "saved": -1.04e-05,
+        "saved_share": null
+      }
+    }
+  },
+  "segments": [
+    {
+      "from": 1,
+      "to": 50,
+      "requests": 50,
+      "hit_rate": 0.1,
+      "semantic_hit_rate": 0.1
+    }
+  ],
+  "curve": [
+    {
+      "end": 50,
+      "hit_rate": 0.1,
+      "semantic_rate": 0.1
+    }
+  ],
+  "thresholds": {
+    "thresholds": [
+      0.7,
+      0.72,
+      0.74,
+      0.75,
+      0.76,
+      0.78,
+      0.8,
+      0.82,
+      0.84,
+      0.86,
+      0.88,
+      0.9,
+      0.92,
+      0.94,
+      0.96,
+      0.98
+    ],
+    "checkpoints": {
+      "50": [
+        {
+          "threshold": 0.7,
+          "hit_rate": 0.16,
+          "semantic_rate": 0.16
+        },
+        {
+          "threshold": 0.72,
+          "hit_rate": 0.14,
+          "semantic_rate": 0.14
+        },
+        {
+          "threshold": 0.74,
+          "hit_rate": 0.14,
+          "semantic_rate": 0.14
+        },
+        {
+          "threshold": 0.75,
+          "hit_rate": 0.14,
+          "semantic_rate": 0.14
+        },
+        {
+          "threshold": 0.76,
+          "hit_rate": 0.12,
+          "semantic_rate": 0.12
+        },
+        {
+          "threshold": 0.78,
+          "hit_rate": 0.1,
+          "semantic_rate": 0.1
+        },
+        {
+          "threshold": 0.8,
+          "hit_rate": 0.1,
+          "semantic_rate": 0.1
+        },
+        {
+          "threshold": 0.82,
+          "hit_rate": 0.06,
+          "semantic_rate": 0.06
+        },
+        {
+          "threshold": 0.84,
+          "hit_rate": 0.06,
+          "semantic_rate": 0.06
+        },
+        {
+          "threshold": 0.86,
+          "hit_rate": 0.04,
+          "semantic_rate": 0.04
+        },
+        {
+          "threshold": 0.88,
+          "hit_rate": 0.02,
+          "semantic_rate": 0.02
+        },
+        {
+          "threshold": 0.9,
+          "hit_rate": 0.02,
+          "semantic_rate": 0.02
+        },
+        {
+          "threshold": 0.92,
+          "hit_rate": 0.02,
+          "semantic_rate": 0.02
+        },
+        {
+          "threshold": 0.94,
+          "hit_rate": 0.0,
+          "semantic_rate": 0.0
+        },
+        {
+          "threshold": 0.96,
+          "hit_rate": 0.0,
+          "semantic_rate": 0.0
+        },
+        {
+          "threshold": 0.98,
+          "hit_rate": 0.0,
+          "semantic_rate": 0.0
+        }
+      ]
+    }
+  },
+  "replay_check": {
+    "threshold": 0.75,
+    "replayed_hit_rate": 0.14,
+    "actual_hit_rate": 0.1
+  },
+  "shadow_agreement": {
+    "both_hit": 5,
+    "gateway_only": 0,
+    "shadow_only": 0,
+    "both_miss": 37
+  },
+  "score_calibration": {
+    "pairs": 5,
+    "mean_gateway": 0.8413807630538941,
+    "mean_cosine": 0.8413812398910523,
+    "mean_abs_diff": 4.76837158203125e-07,
+    "max_abs_diff": 7.748603820800781e-07,
+    "correlation": 0.999999999992392
+  },
+  "semantic_score": {
+    "min": 0.7789314985275269,
+    "p50": 0.8190286159515381,
+    "max": 0.9203030467033386
+  },
+  "wrong_hits": null
+}

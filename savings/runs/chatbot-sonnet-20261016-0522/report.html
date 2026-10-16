@@ -1,0 +1,53 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cache savings: chatbot-sonnet-20261016-0522</title><style>
+:root{--bg:#fff;--fg:#1b1f24;--muted:#5d6670;--line:#e3e6ea;--card:#f7f8fa;--accent:#c4262e;
+--s1:#c4262e;--s2:#1f6feb;--s3:#8250df;--s4:#1a7f37;--good:#1a7f37;--bad:#c4262e}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#111418;--fg:#e6e8eb;
+--muted:#9aa3ad;--line:#2a3038;--card:#181c21;--s1:#ff6b6b;--s2:#58a6ff;--s3:#bc8cff;--s4:#3fb950;
+--good:#3fb950;--bad:#ff6b6b}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1080px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:19px;margin:36px 0 8px;padding-top:12px;
+border-top:2px solid var(--accent)}h3{font-size:15px;margin:22px 0 6px}
+.sub{color:var(--muted);margin:0 0 16px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:12px 0}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.tile b{display:block;font-size:22px;font-variant-numeric:tabular-nums}.tile span{color:var(--muted);font-size:12px}
+.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;margin:8px 0;font-variant-numeric:tabular-nums}
+th,td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal}thead th{color:var(--muted);font-weight:600}
+td.sub-row{padding-left:20px;color:var(--muted)}
+.settings td{text-align:left;white-space:normal}.settings td:first-child{color:var(--muted);width:34%}
+figure{margin:8px 0 16px}.chart{width:100%;max-width:680px;height:auto}
+.grid{stroke:var(--line)}.tick,.axis{fill:var(--muted);font-size:11px}
+figcaption{color:var(--muted);font-size:12px}.key{margin-right:14px}
+.key i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.note{color:var(--muted);font-size:13px}ul.ex{padding-left:18px}ul.ex li{margin:4px 0}
+code{font-size:12px}
+</style></head><body><main><h1>Cache savings: chatbot-sonnet-20261016-0522</h1><p class="sub">Semantic cache on the AI Gateway (Keystone). Checkpoints count requests from the start of one stream inside one cache expiry window. Generated 2026-10-16T19:26:18+00:00.</p><h2>A. Chatbot / FAQ assistant — bedrock-global-anthropic-claude-sonnet-4-6</h2><p class="sub">Run <code>chatbot-sonnet-20261016-0522</code> · state complete_with_errors</p><p>No requests yet.</p><h2>Method</h2>
+<ul>
+<li><b>Stream.</b> Each run sends one fixed, seeded stream of requests in order (a small worker pool
+keeps a handful in flight). Every request carries <code>X-cb-cache: semantic</code>,
+<code>X-cb-debug: true</code> and an expiry long enough for the whole run. A per-run tag in the system
+prompt keeps runs from hitting each other's entries (the system prompt is part of the cache key).</li>
+<li><b>Standard vs semantic.</b> The gateway tries an exact lookup before the vector search. A HIT
+replays the stored response with its original <code>id</code>, which names the request that stored
+it: the same user message means a standard (exact) hit, a different one a semantic hit.</li>
+<li><b>Tokens saved.</b> A HIT replays the stored <code>usage</code>, which is what Bedrock reported
+when the answer was first generated and cached. That is counted as saved input and output.</li>
+<li><b>Embedding tokens.</b> In semantic mode the gateway embeds the last user message on every
+request that is not an exact hit, and reuses that vector when it stores a miss. The harness embeds
+the same text with the same model through the gateway's <code>/v1/embeddings</code> and records the
+token count Bedrock returns.</li>
+<li><b>Closest-match score.</b> The gateway reports a score only on a hit, so the harness keeps its
+own copy of the stored vectors and logs the closest match for every request
+(<code>shadow_score</code>). Its search is exact where the gateway's index is approximate.</li>
+<li><b>Other thresholds.</b> The report replays the cache over all logged embeddings at each
+threshold, with the gateway's rules (exact first, then the closest stored entry, misses are stored).
+The replay at the applied threshold is shown next to the measured rate as a check.</li>
+<li><b>Latency.</b> Client-measured time for the chat request, from the harness host.</li>
+<li><b>Wrong hits.</b> A seeded sample of 100 semantic hits is judged by an LLM with caching off:
+does the returned answer fit the question asked? A person can override each verdict in the UI.</li>
+<li><b>Cost.</b> List prices per million tokens: Sonnet 4.6 $3 / $15, Haiku 4.5 $1 / $5, Titan
+embeddings v2 $0.02. Cost without cache counts a hit's replayed usage as what it would have cost.</li>
+</ul></main></body></html>

@@ -1,0 +1,24 @@
+{
+  "workload": "rag",
+  "source": "Couchbase Capella docs (https://docs.couchbase.com/sitemap-cloud.xml), 315 pages, 1599 chunks",
+  "seed": 42,
+  "n": 20000,
+  "question_model": "global.anthropic.claude-sonnet-4-6",
+  "groups": 1499,
+  "popularity": {
+    "group": "Zipf-Mandelbrot s=1.0 q=20.0 over 1499 base questions",
+    "variant": "uniform over the base question and its 3 rewordings"
+  },
+  "retrieval": "BM25 over 450-token chunks; 3,000-5,200 context tokens per message",
+  "system_prompt": "You are the Couchbase Capella documentation assistant. You answer questions from developers and database administrators using only the documentation excerpts provided in the user message.\n\nRules:\n- Base every statement on the excerpts. If they do not contain the answer, say so plainly and suggest what to search for in the docs instead. Never invent settings, limits, commands or UI paths.\n- Prefer concrete steps, exact UI labels, CLI commands and parameter names when the excerpts contain them.\n- When several excerpts disagree, prefer the most specific one and mention the difference.\n- Answer in 250 to 350 words. Use a short numbered list for procedures and inline code for names, no headings.",
+  "system_tokens_est": 174,
+  "max_tokens": 700,
+  "stats": {
+    "requests": 20000,
+    "distinct_messages": 4696,
+    "distinct_groups": 1473,
+    "exact_repeat_share": 0.7652,
+    "reworded_repeat_share": 0.1611,
+    "user_tokens_est_mean": 4249.7
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "run_id": "chatbot-haiku-20261016-0608",
+  "workload": "chatbot",
+  "model": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+  "embed_model": "amazon.titan-embed-text-v2:0",
+  "gateway_url": "https://<gateway host not recorded>",
+  "cache_type": "semantic",
+  "requested_expiry_s": 172800,
+  "requested_threshold": null,
+  "applied_threshold": "0.75",
+  "applied_expiry": "48h0m0s",
+  "concurrency": 8,
+  "limit": 20000,
+  "nonce": "49d296b402fc",
+  "created_at": "2026-10-16T06:08:48.774+00:00",
+  "dataset": {
+    "workload": "chatbot",
+    "source": "Bitext customer support (27K, v11)",
+    "seed": 42,
+    "n": 20000,
+    "popularity": {
+      "intent": "Zipf-Mandelbrot s=1.0 q=2.0 over 27 intents",
+      "phrase": "Zipf-Mandelbrot s=1.1 q=5.0 over phrasings within an intent"
+    },
+    "system_prompt": "You are Nova, the customer support assistant for Northwind Outfitters, an online retailer of outdoor clothing and gear that ships to the United States, Canada and the European Union.\n\nStore policies you can rely on:\n- Orders can be cancelled free of charge until they ship, usually within 24 hours of purchase. After shipping, the customer must request a return instead.\n- Returns are accepted within 30 days of delivery for unused items in original packaging. Refunds go back to the original payment method within 5-7 business days after the return is received.\n- Standard shipping takes 3-5 business days, express 1-2 business days. Orders over $75 ship free.\n- Accepted payment methods: Visa, Mastercard, American Express, PayPal, Apple Pay and store gift cards.\n- Invoices are available under Account > Orders and are emailed when an order ships.\n- Customers can change the shipping address until the order ships, from Account > Orders.\n- Account emails, passwords and newsletter preferences are managed under Account > Settings.\n- Human agents are available by chat or phone at 1-800-555-0199, Monday to Friday, 8am-8pm ET.\n\nHow to answer:\n- Be warm, direct and specific. Give step-by-step instructions when the customer has to do something.\n- Never invent order details, tracking numbers or amounts. If you need an order number or other details you don't have, say exactly what the customer should provide or where to find it.\n- Do not promise exceptions to these policies; offer to connect the customer with a human agent instead.\n- Answer in 120 to 200 words. Use short paragraphs or a short numbered list, no headings.",
+    "system_tokens_est": 406,
+    "max_tokens": 400,
+    "stats": {
+      "requests": 20000,
+      "distinct_messages": 8524,
+      "distinct_groups": 27,
+      "exact_repeat_share": 0.5738,
+      "reworded_repeat_share": 0.4249,
+      "user_tokens_est_mean": 10.7
+    }
+  },
+  "status": "complete",
+  "started_at": "2026-10-16T06:08:48.778+00:00",
+  "resumed_at": null,
+  "first_response_headers": {
+    "x-cache": "MISS",
+    "x-cb-cache-enabled": "true",
+    "x-cb-cache-expiry": "48h0m0s",
+    "x-cb-cache-type": "semantic",
+    "x-cb-semantic-cache-match-threshold": "0.75"
+  },
+  "finished_at": "2026-10-16T06:39:09.955+00:00"
+}

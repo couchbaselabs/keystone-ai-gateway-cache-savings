@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gateway Cache Claims</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div>
+      <h1>AI Gateway semantic cache: claim checks</h1>
+      <p class="sub">Each claim runs live requests against the gateway and shows whether it holds, with the headers, usage and metrics as evidence. Every run uses its own session nonce in the system prompt, so runs never hit each other's cache entries.</p>
+    </div>
+    <div class="header-actions">
+      <a class="button" href="savings.html">Savings test</a>
+      <button id="open-prefs">Preferences</button>
+      <button id="run-all" class="primary">Run all</button>
+    </div>
+  </header>
+
+  <section id="config" class="config"></section>
+
+  <section class="summary-wrap">
+    <div class="summary-head">
+      <h2>Summary</h2>
+      <p id="counts" class="counts"></p>
+    </div>
+    <div class="table-scroll">
+      <table class="summary-table">
+        <thead>
+          <tr><th>#</th><th>Claim</th><th>Status</th><th>Result</th><th>Time</th><th></th></tr>
+        </thead>
+        <tbody id="summary"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <main id="claims"></main>
+
+  <template id="card">
+    <article class="card">
+      <div class="card-head">
+        <div>
+          <h2><span class="num"></span> <span class="title"></span></h2>
+          <p class="claim"></p>
+          <p class="meta"></p>
+        </div>
+        <div class="actions">
+          <span class="pill idle">not run</span>
+          <button class="run">Run</button>
+        </div>
+      </div>
+      <div class="result" hidden>
+        <p class="result-summary"></p>
+        <table class="evidence"></table>
+        <details>
+          <summary>Requests and responses</summary>
+          <div class="steps"></div>
+        </details>
+      </div>
+    </article>
+  </template>
+
+  <dialog id="prefs">
+    <form id="prefs-form" method="dialog">
+      <div class="prefs-head">
+        <h2>Preferences</h2>
+        <p class="sub">Saved to <code id="env-file"></code> and applied right away; no restart needed. Secret fields are never shown: leave them blank to keep the current value.</p>
+      </div>
+      <div id="prefs-fields" class="prefs-fields"></div>
+      <p id="prefs-error" class="prefs-error" hidden></p>
+      <div class="prefs-actions">
+        <button type="button" id="prefs-cancel">Cancel</button>
+        <button type="submit" class="primary" id="prefs-save">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

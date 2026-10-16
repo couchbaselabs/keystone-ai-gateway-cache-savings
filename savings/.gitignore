@@ -1,0 +1,27 @@
+.venv/
+__pycache__/
+.pytest_cache/
+
+# Datasets: the request streams and the inputs they are built from are kept, so
+# every run can be reloaded and the streams rebuilt identically without model
+# calls. Not kept: the Bitext download (re-fetched by the build) and the 104 MB
+# RAG messages file, which `python -m savings datasets --workload rag` rebuilds
+# byte-for-byte from capella-docs.jsonl + rag-questions.jsonl.
+data/bitext.csv
+data/rag-variants.jsonl
+data/*.log
+
+# Runs: keep each run's settings, progress, report and wrong-hit review. Not
+# kept: the raw CSV and answers (tens of MB per 20k run; force-add the ones you
+# want to share), the embedding logs (80 MB per run), logs and process state.
+runs/*/*
+!runs/*/meta.json
+!runs/*/progress.json
+!runs/*/report.html
+!runs/*/report.md
+!runs/*/report.json
+!runs/*/judge.jsonl
+!runs/*/review.json
+!runs/summary/summary.*
+runs/jobs.json
+runs/jobs.json.tmp

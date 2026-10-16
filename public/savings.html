@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cache Savings Test</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="savings.css">
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Cache savings test</h1>
+      <p class="sub">Sends a 20,000-request stream through the gateway's semantic cache and reports hit rate, tokens saved, embedding tokens, latency and wrong hits at 1,000, 10,000 and 20,000 requests, as the Keystone cache savings test request asks.</p>
+    </div>
+    <div class="header-actions">
+      <a class="button" href="./">Claim checks</a>
+      <a class="button" href="./#preferences">Preferences</a>
+    </div>
+  </header>
+
+  <section id="config" class="config"></section>
+  <p id="warn" class="warn-box" hidden></p>
+
+  <main>
+    <article class="card">
+      <h2>1. Datasets</h2>
+      <p class="meta">Each workload is a fixed, seeded stream. Build once; every run of that workload replays the same stream.</p>
+      <div id="datasets" class="ds-grid"></div>
+    </article>
+
+    <article class="card">
+      <h2>2. Start a run</h2>
+      <form id="run-form" class="run-form">
+        <label>Workload
+          <select name="workload">
+            <option value="chatbot">A. Chatbot / FAQ</option>
+            <option value="rag">B. Agentic / RAG</option>
+          </select>
+        </label>
+        <label>Model
+          <select name="model">
+            <option value="sonnet">Sonnet 4.6</option>
+            <option value="haiku">Haiku 4.5</option>
+          </select>
+        </label>
+        <label>Requests
+          <input name="limit" type="number" min="1" max="20000" step="1" placeholder="20000 (all)">
+        </label>
+        <label>Concurrency
+          <input name="concurrency" type="number" min="1" max="64" step="1" value="8">
+        </label>
+        <label>Expiry (s)
+          <input name="expiry" type="number" min="60" step="1" value="172800">
+        </label>
+        <label class="wide">Run id (optional)
+          <input name="runId" type="text" placeholder="auto" autocomplete="off" spellcheck="false">
+        </label>
+        <div class="form-foot">
+          <span id="estimate" class="meta"></span>
+          <button type="submit" class="primary">Start run</button>
+        </div>
+      </form>
+      <p id="run-error" class="field-error" hidden></p>
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <h2>3. Runs</h2>
+        <div class="row-actions">
+          <button id="summary-btn" disabled>Build summary of selected</button>
+          <a id="summary-link" class="button" href="api/savings/files/summary/summary.html" target="_blank" hidden>Open summary</a>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="runs-table">
+          <thead><tr><th></th><th>Run</th><th>Status</th><th>Progress</th><th>Hit rate</th><th>Wrong hits</th><th></th></tr></thead>
+          <tbody id="runs"></tbody>
+        </table>
+      </div>
+      <p id="no-runs" class="meta" hidden>No runs yet.</p>
+    </article>
+
+    <article class="card" id="detail" hidden>
+      <div class="card-head">
+        <h2 id="detail-title"></h2>
+        <div class="row-actions" id="detail-actions"></div>
+      </div>
+      <nav class="tabs" role="tablist">
+        <button role="tab" data-tab="report" aria-selected="true">Report</button>
+        <button role="tab" data-tab="review">Wrong-hit review</button>
+        <button role="tab" data-tab="log">Log</button>
+      </nav>
+      <div data-panel="report"><iframe id="report-frame" title="Run report"></iframe></div>
+      <div data-panel="review" hidden><div id="review"></div></div>
+      <div data-panel="log" hidden><pre id="log"></pre></div>
+    </article>
+  </main>
+
+  <script src="savings.js"></script>
+</body>
+</html>

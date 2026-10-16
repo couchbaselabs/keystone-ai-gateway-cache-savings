@@ -1,0 +1,1 @@
+{"run_id": "rag-sonnet-20261016-0544", "state": "complete", "total": 500, "done": 500, "hits": 425, "standard": 10, "semantic": 415, "errors": 0, "hit_rate": 0.85, "req_per_s": 5.39, "eta_s": 0, "updated_at": "2026-10-16T05:46:35.020+00:00"}

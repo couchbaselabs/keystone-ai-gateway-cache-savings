@@ -1,0 +1,1 @@
+{"run_id": "chatbot-haiku-20261016-0552", "state": "complete", "total": 100, "done": 100, "hits": 21, "standard": 2, "semantic": 19, "errors": 0, "hit_rate": 0.21, "req_per_s": 3.11, "eta_s": 0, "updated_at": "2026-10-16T05:53:30.258+00:00"}

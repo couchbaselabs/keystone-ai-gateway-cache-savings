@@ -1,0 +1,26 @@
+{
+  "name": "keystone-ai-gateway-cache-savings",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Measures what the Keystone AI Gateway semantic cache saves (hit rate, tokens, latency, wrong hits) and checks its cache behaviour against a live gateway.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "mock": "node test/mock-gateway.js",
+    "smoke": "node test/smoke.js",
+    "savings:setup": "python3 -m venv savings/.venv && savings/.venv/bin/pip install -r savings/requirements.txt",
+    "savings:test": "cd savings && .venv/bin/python -m pytest -q tests",
+    "savings:smoke": "node test/savings-smoke.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2"
+  },
+  "optionalDependencies": {
+    "couchbase": "^4.4.5"
+  },
+  "license": "Apache-2.0"
+}
