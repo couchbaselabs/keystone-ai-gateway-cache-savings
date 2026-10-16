@@ -61,3 +61,5 @@
   .runs-table th:nth-child(6), .runs-table td:nth-child(6) { display: none; }
   #report-frame { height: 70vh; }
 }
+button.danger { color: var(--bad); border-color: var(--bad); }
+button.danger:disabled { color: var(--muted); border-color: var(--border); }

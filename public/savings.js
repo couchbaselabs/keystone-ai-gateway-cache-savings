@@ -191,8 +191,8 @@ function select(id) {
   renderDetail(true)
 }
 
-function actionButton(label, fn, { primary = false, disabled = false } = {}) {
-  const b = el('button', { className: `small ${primary ? 'primary' : ''}`, textContent: label, disabled })
+function actionButton(label, fn, { primary = false, danger = false, disabled = false } = {}) {
+  const b = el('button', { className: `small ${primary ? 'primary' : ''} ${danger ? 'danger' : ''}`, textContent: label, disabled })
   b.addEventListener('click', async () => {
     b.disabled = true
     try {
@@ -220,6 +220,7 @@ function renderDetail(force = false) {
     actionButton(busy('report') ? 'Rebuilding…' : 'Rebuild report', () => api(`/runs/${r.runId}/report`, { method: 'POST' }), { disabled: busy('report') }),
     el('a', { className: 'button', href: `api/savings/files/${r.runId}/report.html`, target: '_blank', textContent: 'Report ↗' }),
     el('a', { className: 'button', href: `api/savings/files/${r.runId}/requests.csv`, textContent: 'CSV' }),
+    actionButton('Delete run', () => deleteRun(r), { danger: true, disabled: running || busy('judge') || busy('report') }),
   ]
   $('#detail-actions').replaceChildren(...actions)
   if (state.tab === 'report' && (force || r.reportAt !== state.reportAt)) {
@@ -228,6 +229,16 @@ function renderDetail(force = false) {
   }
   if (state.tab === 'log') loadLog()
   if (state.tab === 'review' && force) loadReview()
+}
+
+async function deleteRun(r) {
+  const p = r.progress ?? {}
+  const what = `${r.runId}\n${WORKLOADS[r.workload]} · ${r.model} · ${fmt(p.done ?? 0)} requests${r.judged ? ' · judged' : ''}`
+  if (!confirm(`Delete this run and all its files (CSV, report, wrong-hit reviews)? This cannot be undone.\n\n${what}`)) return
+  await api(`/runs/${r.runId}`, { method: 'DELETE' })
+  state.checked.delete(r.runId)
+  if (state.selected === r.runId) state.selected = null
+  saveView()
 }
 
 async function loadLog() {

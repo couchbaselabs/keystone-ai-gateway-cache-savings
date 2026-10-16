@@ -146,5 +146,19 @@ check(run2?.jobs.some(x => x.key === 'judge:smoke' && x.state === 'done'), 'afte
 check(back?.summary.exists, 'after restart: summary still there')
 const rv2 = (await call('/runs/smoke/review')).body
 check(rv2.items.find(i => i.seq === seq)?.human === 'wrong', 'after restart: human verdict kept')
+
+// Deleting a run: refused while it runs, then removes it and its files.
+const r2 = await call('/runs', 'POST', { workload: 'chatbot', model: 'sonnet', runId: 'smoke2', limit: 300, concurrency: 2 })
+check(r2.status === 200, 'second run started')
+await until(async () => (await call('/state')).body.runs.find(x => x.runId === 'smoke2')?.status === 'running', 15000)
+check((await call('/runs/smoke2', 'DELETE')).status === 409, 'delete refused while the run is running')
+await until(async () => (await call('/state')).body.runs.find(x => x.runId === 'smoke2')?.status === 'complete')
+const del = await call('/runs/smoke2', 'DELETE')
+check(del.status === 200, 'finished run deleted')
+const afterDel = (await call('/state')).body
+check(!afterDel.runs.some(x => x.runId === 'smoke2') && afterDel.runs.some(x => x.runId === 'smoke'), 'deleted run gone, other run kept')
+check((await call('/files/smoke2/report.html')).status === 404, 'deleted run files gone')
+check((await call('/runs/smoke2', 'DELETE')).status === 404, 'deleting again: 404')
+check((await call('/runs/summary', 'DELETE')).status === 404, 'summary folder cannot be deleted as a run')
 console.log(`runs dir: ${env.SAVINGS_RUNS_DIR}`)
 stop(0)
