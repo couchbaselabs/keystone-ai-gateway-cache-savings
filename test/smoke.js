@@ -12,6 +12,8 @@ writeFileSync(envFile, '# smoke\nSETTLE_MS=50\n')
 const env = {
   ...process.env,
   ENV_FILE: envFile,
+  PORT_FALLBACK: 'false',
+  OPEN_BROWSER: 'false',
   RESULTS_FILE: join(envFile, '..', 'claim-results.json'),
   MOCK_PORT: String(MOCK),
   PORT: String(APP),
@@ -36,10 +38,33 @@ const stop = code => {
   procs.forEach(p => p.kill())
   process.exit(code)
 }
+process.on('uncaughtException', err => {
+  console.error(err)
+  stop(1)
+})
+process.on('unhandledRejection', err => {
+  console.error(err)
+  stop(1)
+})
+const ready = async (url, ms = 15000) => {
+  const t0 = Date.now()
+  while (Date.now() - t0 < ms) {
+    try {
+      if ((await fetch(url)).ok) return true
+    } catch {
+      // not up yet
+    }
+    await new Promise(r => setTimeout(r, 200))
+  }
+  return false
+}
 
 const wait = ms => new Promise(r => setTimeout(r, ms))
-await wait(1000)
 const base = `http://localhost:${APP}`
+if (!(await ready(`${base}/api/config`)) || !(await ready(`http://localhost:${MOCK}/metrics`))) {
+  console.error('server or mock gateway did not start')
+  stop(1)
+}
 const claims = await (await fetch(`${base}/api/claims`)).json()
 let failed = 0
 for (const c of claims) {
@@ -82,14 +107,16 @@ const html = await (await fetch(base)).text()
 if (!html.includes('id="claims"')) failed++
 
 // Restart the server: preferences (from .env) and claim results (from disk) reload.
-procs[1].kill()
-await wait(500)
+await new Promise(r => {
+  procs[1].once('exit', r)
+  procs[1].kill()
+})
 // Without the env overrides, so the saved .env is what loads.
 const env2 = { ...env }
 delete env2.SETTLE_MS
 delete env2.Q1
 procs[1] = spawn('node', ['server.js'], { cwd: root, env: env2, stdio: 'inherit' })
-await wait(1500)
+if (!(await ready(`${base}/api/config`))) failed++
 const after = await (await fetch(`${base}/api/results`)).json()
 const cfg2 = await (await fetch(`${base}/api/config`)).json()
 const reloadOk =

@@ -23,7 +23,8 @@ requests, plus the raw per-request CSV.
 
 ```bash
 npm run savings:setup        # Python venv in savings/.venv (numpy, httpx, pytest)
-npm start                    # then open http://localhost:4000/savings.html
+npm start                    # opens http://localhost:4000/savings.html in your browser
+                             # (next free port if 4000 is busy; OPEN_BROWSER=false to skip)
 ```
 
 On the page: build the datasets, then start a run for each workload and model. Runs are detached and

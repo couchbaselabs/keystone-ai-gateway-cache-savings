@@ -20,6 +20,8 @@ writeFileSync(envFile, '# smoke\n')
 const env = {
   ...process.env,
   ENV_FILE: envFile,
+  PORT_FALLBACK: 'false',
+  OPEN_BROWSER: 'false',
   RESULTS_FILE: join(envFile, '..', 'claim-results.json'),
   MOCK_PORT: String(MOCK),
   MOCK_STORE_EMBEDDING: 'query',
@@ -126,8 +128,10 @@ check(sum, 'summary built')
 const sh = await call('/files/summary/summary.html')
 check(sh.status === 200 && sh.body.includes('Keystone cache savings test'), 'summary.html served')
 // Restart the UI server: runs, reports, reviews and job history reload from disk.
-procs[1].kill()
-await wait(500)
+await new Promise(r => {
+  procs[1].once('exit', r)
+  procs[1].kill()
+})
 procs[1] = spawn('node', ['server.js'], { cwd: root, env, stdio: 'inherit' })
 const back = await until(async () => {
   try {

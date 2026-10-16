@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
+import { spawn } from 'node:child_process'
 import express from 'express'
 import { config, publicConfig, updatePreferences } from './lib/config.js'
 import { claimList, runClaim } from './lib/claims.js'
@@ -66,8 +67,41 @@ app.put('/api/preferences', (req, res) => {
     .catch(err => res.status(500).json({ ok: false, errors: { _: err.message } }))
 })
 
-app.listen(config.port, config.host, () => {
-  console.log(`Keystone AI Gateway cache savings on http://${config.host}:${config.port}`)
-  console.log(`Gateway: ${config.gatewayUrl}  chat: ${config.chatModel}  embed: ${config.embedModel}`)
-  if (!config.apiKey) console.log('GATEWAY_API_KEY is not set; set it in Preferences or .env.')
-})
+// Listen on PORT, or the next free port when it is taken (for example by an
+// older copy of this server), trying up to 20 ports. PORT_FALLBACK=false turns
+// this off, so tests that expect an exact port fail instead of moving.
+const MAX_PORT_TRIES = process.env.PORT_FALLBACK === 'false' ? 0 : 20
+function listen(port, triesLeft) {
+  const server = app.listen(port, config.host)
+  server.once('listening', () => {
+    if (port !== config.port) console.log(`Port ${config.port} is busy; using ${port} instead.`)
+    config.port = port
+    console.log(`Keystone AI Gateway cache savings on http://${config.host}:${port}`)
+    console.log(`Gateway: ${config.gatewayUrl}  chat: ${config.chatModel}  embed: ${config.embedModel}`)
+    if (!config.apiKey) console.log('GATEWAY_API_KEY is not set; set it in Preferences or .env.')
+    openBrowser(`http://${config.host}:${port}/savings.html`)
+  })
+  server.once('error', err => {
+    if (err.code === 'EADDRINUSE' && triesLeft > 0) return listen(port + 1, triesLeft - 1)
+    console.error(`Cannot listen on ${config.host}:${port}: ${err.message}`)
+    process.exit(1)
+  })
+}
+listen(config.port, MAX_PORT_TRIES)
+
+// Open the page in the default browser once the server is up. OPEN_BROWSER=false
+// (or a CI environment) skips it; a missing opener only prints the URL.
+function openBrowser(url) {
+  if (process.env.OPEN_BROWSER === 'false' || process.env.CI) return
+  const [cmd, args] =
+    process.platform === 'darwin' ? ['open', [url]]
+      : process.platform === 'win32' ? ['cmd', ['/c', 'start', '', url]]
+        : ['xdg-open', [url]]
+  try {
+    const child = spawn(cmd, args, { stdio: 'ignore', detached: true })
+    child.on('error', () => console.log(`Open ${url} in your browser.`))
+    child.unref()
+  } catch {
+    console.log(`Open ${url} in your browser.`)
+  }
+}
