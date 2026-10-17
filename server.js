@@ -31,6 +31,11 @@ const saveResults = () => {
   renameSync(resultsFile + '.tmp', resultsFile)
 }
 const results = loadResults()
+// Drop saved results of claims that were removed from the list.
+{
+  const known = new Set(claimList().map(c => c.id))
+  for (const k of Object.keys(results)) if (!known.has(k)) delete results[k]
+}
 app.get('/api/results', (_req, res) => res.json(results))
 
 // Run one claim at a time: claims read shared metrics counters and the

@@ -21,9 +21,6 @@ function renderConfigStrip() {
     ['API key', set('GATEWAY_API_KEY')],
     ['Chat model', val('CHAT_MODEL')],
     ['Embedding model', val('EMBED_MODEL')],
-    ['Metrics', byKey.METRICS_URL?.value || 'off'],
-    ['Couchbase check', byKey.CB_CONNECTION_STRING?.value ? val('CB_CACHE_KEYSPACE') : 'off'],
-    ['Second key', set('GATEWAY_API_KEY_2')],
   ]
   const missingKey = !byKey.GATEWAY_API_KEY?.isSet
   $('#config').replaceChildren(

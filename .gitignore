@@ -1,3 +1,5 @@
 node_modules/
 .env
 .DS_Store
+# Claim results record live gateway responses; keep them local like run results
+results/

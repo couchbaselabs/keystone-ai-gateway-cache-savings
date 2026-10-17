@@ -84,30 +84,23 @@ mock gateway.
 
 ## Claim checks (`/`)
 
-A small web UI that checks, against a live AI Gateway (Model Service), the claims from the review of the
-Keystone demo script (Hybrid RAG / Semantic Cache / Observe & Tune). Each card runs real requests and reports
-**CONFIRMED**, **REFUTED**, **INCONCLUSIVE**, **SKIPPED** or **ERROR**, with the response headers, usage and
-metric deltas as evidence.
+A small web UI that checks, against a live gateway, how its semantic cache behaves. Each card runs real
+requests and reports **CONFIRMED**, **REFUTED**, **INCONCLUSIVE** or **ERROR**, with the response headers and
+usage as evidence. The cards below are the ones confirmed against the Serverless Model Service gateway.
 
-| # | Card | Claim | Doc steps it affects |
-|---|---|---|---|
-| 1 | bedrock-openai | Haiku 4.5 and Titan v2 work through the gateway; usage is `prompt_tokens`/`completion_tokens`; 1024 dims | 1.3, 1.5, 2.2T, 2.9, 3.3 |
-| 2 | hit-header | HIT/MISS is `X-Cache`; `X-cb-match-score` only with `X-cb-debug: true` | 2.2, 2.3, 2.6, 2.7 |
-| 3 | query-vs-answer | The cache scores the new question against the stored **answer** | 2.3, 2.6, 2.8 |
-| 4 | system-prompt-key | The system prompt is in the cache key; reordered RAG context means no HIT | 2.3, 2.7, 2.8 |
-| 5 | usage-on-hit | A HIT replays the original `usage` block | 2.2T, 2.3T, 2.9 |
-| 6 | metrics | `cache_hits`, `cached_prompt_tokens`, … replace `hit_count` / `tokens_saved_total` | 2.4, 2.7, 2.9, 3.2 |
-| 7 | retrieval-on-hit | A gateway HIT still pays for client-side embed + retrieval | 2.3, 2.5, 2.8 |
-| 8 | overrides | `X-cb-cache-threshold` and `X-cb-cache-expiry-duration` work per request | 2.6, 2.10 |
-| 9 | false-positive | A low threshold can serve the headphones answer to another question | 2.6, 2.8 |
-| 10 | cache-doc-shape | Cache docs have none of the fields the doc's SQL++ reads (needs Couchbase) | 2.1, 2.4, 2.9, 3.2 |
-| 11 | per-key | Extra: whether entries are shared across API keys (needs a second key) | 2.3, 2.7 |
+| # | Card | Claim |
+|---|---|---|
+| 1 | bedrock-openai | Haiku 4.5 and Titan v2 work through the gateway; usage is `prompt_tokens`/`completion_tokens`; 1024 dims |
+| 2 | hit-header | HIT/MISS is `X-Cache`; `X-cb-match-score` only with `X-cb-debug: true` |
+| 3 | system-prompt-key | The system prompt is in the cache key; reordered RAG context means no HIT |
+| 4 | usage-on-hit | A HIT replays the original `usage` block |
+| 5 | retrieval-on-hit | A gateway HIT still pays for client-side embed + retrieval |
 
 ### Run
 
 ```bash
-npm install            # add `npm install couchbase` for the cache-doc-shape card
-cp .env.example .env   # set GATEWAY_URL, GATEWAY_API_KEY, model ids, METRICS_URL
+npm install
+cp .env.example .env   # set GATEWAY_URL, GATEWAY_API_KEY and the model ids
 npm start              # http://localhost:4000
 ```
 
@@ -115,10 +108,9 @@ The page opens with a **summary table** (claim number, status, result, time, a R
 the numbered claim cards; click a row to jump to its card. The latest results survive a page reload.
 
 **Preferences** (button at the top right, or `http://localhost:4000/#preferences`) edits everything in
-`.env`: gateway URL and API keys, model ids, metrics URL and prefix, the settle pause, the test questions
-and the optional Couchbase connection. Saving validates the values, applies them immediately (no
-restart) and rewrites only those lines in `.env`. API keys and the Couchbase password are write-only:
-the page never receives them; leave the field blank to keep the current value, or tick *clear*. Changing
+`.env`: gateway URL and API key, model ids, the settle pause and the two test questions. Saving
+validates the values, applies them immediately (no restart) and rewrites only those lines in `.env`.
+The API key is write-only: the page never receives it; leave the field blank to keep the current value, or tick *clear*. Changing
 any setting clears the previous results, since they describe the old settings.
 
 Because the page accepts keys and URLs, the server binds to `127.0.0.1` (`HOST` in `.env`). Don't
@@ -132,7 +124,7 @@ From the `ai-gateway` repo (see its `CLAUDE.md` / `SKILLS.md`), with AWS credent
 make build
 REQUIRE_TENANT_ID=false LOG_LEVEL=info IS_LOCAL_CONFIG=true \
   AIGW_CONFIG_FILE=bedrock.local.config.json bin/ai-gateway
-# HTTPS :8081, metrics :9090. Create an API key with the create-api-key skill.
+# HTTPS :8081. Create an API key with the create-api-key skill.
 ```
 
 The defaults in `.env.example` match `bedrock.local.config.json`. Its Haiku model defaults to the standard
@@ -140,21 +132,20 @@ cache; the app opts each request into semantic caching with `X-cb-cache: semanti
 
 #### Against a deployed gateway
 
-Set `GATEWAY_URL`, `GATEWAY_API_KEY`, `CHAT_MODEL` / `EMBED_MODEL` to that deployment's model ids, and
-`METRICS_URL` if you can reach its Prometheus endpoint. Leave `INSECURE_TLS=false`.
+Set `GATEWAY_URL`, `GATEWAY_API_KEY`, and `CHAT_MODEL` / `EMBED_MODEL` to that deployment's model ids.
+Leave `INSECURE_TLS=false`.
 
 ### How runs stay clean
 
 - Every run puts a random `[demo-session …]` nonce in the system prompt. The system prompt is part of the
   gateway's cache hash, so runs never see each other's entries or other users' entries.
-- Runs are serialized on the server, because the metrics card reads shared counters. Other traffic on the
-  same gateway can still move them; run that card when the gateway is idle.
+- Runs are serialized on the server, so cards never overlap on the shared cache.
 - The first cache card waits until the vector index answers (the gateway creates it on first use).
   `SETTLE_MS` is the pause after each store before a lookup.
 
 ### Cost
 
-Roughly 40 Haiku calls (max 120 output tokens) and 40 Titan calls for "Run all": well under $0.05.
+Roughly 25 Haiku calls (max 120 output tokens) and 25 Titan calls for "Run all": well under $0.05.
 
 ### Smoke test (plumbing only)
 

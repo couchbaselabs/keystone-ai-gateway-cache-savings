@@ -19,15 +19,11 @@ const env = {
   PORT: String(APP),
   GATEWAY_URL: `http://localhost:${MOCK}`,
   GATEWAY_API_KEY: 'mock-key-1',
-  GATEWAY_API_KEY_2: 'mock-key-2',
   INSECURE_TLS: 'false',
   CHAT_MODEL: 'mock-chat',
   EMBED_MODEL: 'mock-embed',
   EXPECTED_EMBED_DIMS: '1024',
-  METRICS_URL: `http://localhost:${MOCK}/metrics`,
-  METRICS_PREFIX: 'ai_model_service_gateway_',
   SETTLE_MS: '50',
-  CB_CONNECTION_STRING: '',
 }
 const root = new URL('..', import.meta.url).pathname
 const procs = [
