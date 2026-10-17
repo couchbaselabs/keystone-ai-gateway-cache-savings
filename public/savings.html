@@ -89,10 +89,38 @@
       <nav class="tabs" role="tablist">
         <button role="tab" data-tab="report" aria-selected="true">Report</button>
         <button role="tab" data-tab="review">Wrong-hit review</button>
+        <button role="tab" data-tab="spot">Spot check</button>
         <button role="tab" data-tab="log">Log</button>
       </nav>
       <div data-panel="report"><iframe id="report-frame" title="Run report"></iframe></div>
       <div data-panel="review" hidden><div id="review"></div></div>
+      <div data-panel="spot" hidden>
+        <form id="spot-form" class="spot-form">
+          <label>Show
+            <select name="kind">
+              <option value="all">All requests</option>
+              <option value="miss">Misses</option>
+              <option value="hit">All hits</option>
+              <option value="standard">Standard hits</option>
+              <option value="semantic">Semantic hits</option>
+            </select>
+          </label>
+          <label>Score from <input name="min" type="number" step="0.01" min="0" max="1" placeholder="any"></label>
+          <label>to <input name="max" type="number" step="0.01" min="0" max="1" placeholder="any"></label>
+          <label class="wide">Text in question or answer <input name="q" type="search" placeholder="e.g. refund" autocomplete="off"></label>
+          <label>Cards
+            <select name="n"><option>10</option><option selected>20</option><option>50</option></select>
+          </label>
+          <label class="check"><input name="flagged" type="checkbox" value="1"> only ones I flagged</label>
+          <div class="spot-actions">
+            <button type="submit" class="primary small">Reload (new random set)</button>
+            <label>Seed <input name="seed" type="number" min="0" step="1" placeholder="random"></label>
+            <button type="button" id="spot-same" class="small">Same set</button>
+          </div>
+        </form>
+        <p id="spot-head" class="meta"></p>
+        <div id="spot"></div>
+      </div>
       <div data-panel="log" hidden><pre id="log"></pre></div>
     </article>
   </main>

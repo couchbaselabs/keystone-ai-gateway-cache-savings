@@ -188,3 +188,22 @@ def test_ensure_columns_reorders_csv_with_response(tmp_path):
         assert rd.fieldnames == COLUMNS
     assert rd.fieldnames.index('response') == rd.fieldnames.index('question') + 1
     assert (row['question'], row['response'], row['response_id']) == ('q?', 'a.', 'id1')
+
+
+def test_spot_check_summary_is_separate_from_wrong_hits(tmp_path):
+    run_dir = tmp_path / 'r'
+    run_dir.mkdir()
+    rows = [
+        {'seq': 1, 'cache': 'MISS', 'hit_type': '', 'question': 'a?', 'gateway_score': None},
+        {'seq': 2, 'cache': 'HIT', 'hit_type': 'semantic', 'question': 'b?', 'gateway_score': 0.77},
+        {'seq': 3, 'cache': 'HIT', 'hit_type': 'standard', 'question': 'c?', 'gateway_score': 1.0},
+    ]
+    assert report.spot_check_summary(run_dir, rows) is None
+    (run_dir / 'spotcheck.json').write_text(json.dumps({
+        '1': {'flag': 'ok'}, '2': {'flag': 'wrong', 'note': 'refund vs return'}, '3': {'flag': 'ok'}}))
+    sc = report.spot_check_summary(run_dir, rows)
+    assert (sc['checked'], sc['wrong']) == (3, 1)
+    assert sc['by_kind'] == {'miss': {'checked': 1, 'wrong': 0}, 'semantic': {'checked': 1, 'wrong': 1},
+                             'standard': {'checked': 1, 'wrong': 0}}
+    assert sc['examples'] == [{'seq': 2, 'kind': 'semantic', 'question': 'b?', 'score': 0.77,
+                               'note': 'refund vs return'}]

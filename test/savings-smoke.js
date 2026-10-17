@@ -148,6 +148,32 @@ check(back?.summary.exists, 'after restart: summary still there')
 const rv2 = (await call('/runs/smoke/review')).body
 check(rv2.items.find(i => i.seq === seq)?.human === 'wrong', 'after restart: human verdict kept')
 
+// Spot check: seeded random sample with filters, flags kept in spotcheck.json.
+const sp1 = (await call('/runs/smoke/spot?kind=all&n=10&seed=42')).body
+const sp2 = (await call('/runs/smoke/spot?kind=all&n=10&seed=42')).body
+check(sp1.items.length === 10 && sp1.seed === 42 && JSON.stringify(sp1.items.map(i => i.seq)) === JSON.stringify(sp2.items.map(i => i.seq)), 'spot check: same seed, same sample')
+check(sp1.items.every(i => i.question && 'response' in i), 'spot check: cards carry question and response')
+const spm = (await call('/runs/smoke/spot?kind=miss&n=50')).body
+check(spm.items.length > 0 && spm.items.every(i => i.cache === 'MISS'), 'spot check: miss filter')
+const sps = (await call('/runs/smoke/spot?kind=semantic&min=0.5&max=0.9&n=50')).body
+check(sps.items.length > 0 && sps.items.every(i => i.hitType === 'semantic' && i.score >= 0.5 && i.score <= 0.9), 'spot check: semantic score band')
+check(sps.items.every(i => i.matchedSeq === null || i.matchedQuestion), 'spot check: hits carry the question their answer was written for')
+check((await call('/runs/smoke/spot?min=abc')).status === 400, 'spot check: bad score rejected')
+const flagSeq = sp1.items[0].seq
+const put1 = await call('/runs/smoke/spot', 'PUT', { seq: flagSeq, flag: 'wrong', note: 'off topic' })
+check(put1.status === 200 && put1.body.wrong === 1, 'spot check: flag saved')
+check((await call('/runs/smoke/spot', 'PUT', { seq: 999999, flag: 'ok' })).status === 404, 'spot check: unknown request refused')
+check((await call('/runs/smoke/spot', 'PUT', { seq: flagSeq, flag: 'maybe' })).status === 400, 'spot check: bad flag refused')
+const spf = (await call('/runs/smoke/spot?flagged=1&n=50')).body
+check(spf.items.length === 1 && spf.items[0].flag?.note === 'off topic', 'spot check: flagged filter shows the flag and note')
+await until(async () => !(await call('/state')).body.runs.find(x => x.runId === 'smoke').jobs.some(x => x.state === 'running'))
+check((await call('/runs/smoke/report', 'POST')).status === 200, 'report rebuilt after spot check')
+const rj = await until(async () => {
+  const r = await call('/files/smoke/report.json')
+  return r.status === 200 && r.body.spot_check ? r.body : null
+})
+check(rj?.spot_check?.wrong === 1 && rj.wrong_hits.sampled === 20, 'report: spot check listed apart; wrong-hit sample unchanged')
+
 // Zip downloads: share (report, CSV, README) and full (restorable, no job.json).
 const zipOf = async q => {
   const res = await fetch(`${base}/runs/smoke/zip?${q}`)
@@ -156,7 +182,7 @@ const zipOf = async q => {
 }
 const zs = await zipOf('kind=share')
 check(zs.status === 200 && zs.buf.subarray(0, 2).toString() === 'PK' && zs.name.includes('smoke-share.zip'), 'share zip downloads')
-check(['smoke/report.html', 'smoke/requests.csv', 'smoke/README.txt', 'smoke/judge.jsonl'].every(f => zs.text.includes(f)) && !zs.text.includes('smoke/embeds.f32'), 'share zip has report, CSV, README, judge; no vectors')
+check(['smoke/report.html', 'smoke/requests.csv', 'smoke/README.txt', 'smoke/judge.jsonl', 'smoke/spotcheck.json'].every(f => zs.text.includes(f)) && !zs.text.includes('smoke/embeds.f32'), 'share zip has report, CSV, README, judge; no vectors')
 const zf = await zipOf('kind=full&vectors=0')
 check(zf.status === 200 && zf.name.includes('smoke-full-no-vectors.zip') && zf.text.includes('smoke/meta.json') && !zf.text.includes('smoke/job.json') && !zf.text.includes('smoke/shadow.f32'), 'full zip without vectors: restorable files, no job.json')
 check((await fetch(`${base}/runs/nope/zip?kind=share`)).status === 404, 'zip of unknown run: 404')

@@ -35,7 +35,7 @@ function saveView() {
   try {
     const f = $('#run-form')
     const form = Object.fromEntries(['workload', 'model', 'limit', 'concurrency', 'expiry'].map(k => [k, f[k].value]))
-    localStorage.setItem(VIEW_KEY, JSON.stringify({ selected: state.selected, tab: state.tab, checked: [...state.checked], form }))
+    localStorage.setItem(VIEW_KEY, JSON.stringify({ selected: state.selected, tab: state.tab, checked: [...state.checked], form, spot: spotFilters() }))
   } catch {
     // storage unavailable (private mode): the page still works, it just forgets
   }
@@ -45,7 +45,8 @@ function loadView() {
     const v = JSON.parse(localStorage.getItem(VIEW_KEY) ?? 'null')
     if (!v) return
     state.selected = v.selected ?? null
-    state.tab = ['report', 'review', 'log'].includes(v.tab) ? v.tab : 'report'
+    state.tab = ['report', 'review', 'spot', 'log'].includes(v.tab) ? v.tab : 'report'
+    state.spot = v.spot ?? null
     state.checked = new Set(v.checked ?? [])
     const f = $('#run-form')
     for (const [k, val] of Object.entries(v.form ?? {})) if (f[k] && val !== undefined) f[k].value = val
@@ -169,7 +170,7 @@ function renderRuns() {
           'td',
           {},
           el('span', { textContent: `${fmt(done)} / ${fmt(total)}` }),
-          el('span', { className: 'sub2', textContent: r.status === 'running' ? `${fmt(p.req_per_s, 2)} req/s · ETA ${dur(p.eta_s)}${p.errors ? ` · ${p.errors} errors` : ''}` : p.errors ? `${p.errors} errors` : '' }),
+          el('span', { className: 'sub2', textContent: r.status === 'finishing' ? 'all requests done; building the report' : r.status === 'running' ? `${fmt(p.req_per_s, 2)} req/s · ETA ${dur(p.eta_s)}${p.errors ? ` · ${p.errors} errors` : ''}` : p.errors ? `${p.errors} errors` : '' }),
           el('div', { className: 'bar' }, el('i', { style: `width:${total ? (100 * done) / total : 0}%` })),
         ),
         el('td', {}, el('span', { textContent: pct(p.hit_rate) }), el('span', { className: 'sub2', textContent: p.done ? `std ${fmt(p.standard)} · sem ${fmt(p.semantic)}` : '' })),
@@ -215,11 +216,11 @@ function renderDetail(force = false) {
   $('#detail').hidden = !r
   if (!r) return
   $('#detail-title').textContent = r.runId
-  const running = r.status === 'running'
+  const running = r.status === 'running' || r.status === 'finishing'
   const busy = j => r.jobs.some(x => x.key.startsWith(j) && x.state === 'running')
   const actions = [
     running
-      ? actionButton('Stop', () => api(`/runs/${r.runId}/stop`, { method: 'POST' }))
+      ? actionButton(r.status === 'finishing' ? 'Building report…' : 'Stop', () => api(`/runs/${r.runId}/stop`, { method: 'POST' }), { disabled: r.status === 'finishing' })
       : actionButton('Resume', () => api(`/runs/${r.runId}/resume`, { method: 'POST' }), { disabled: r.status === 'complete' }),
     actionButton(busy('judge') ? 'Judging…' : 'Judge 100 semantic hits', () => api(`/runs/${r.runId}/judge`, { method: 'POST', body: { sample: 100 } }), { disabled: running || busy('judge') }),
     actionButton(busy('report') ? 'Rebuilding…' : 'Rebuild report', () => api(`/runs/${r.runId}/report`, { method: 'POST' }), { disabled: busy('report') }),
@@ -235,6 +236,7 @@ function renderDetail(force = false) {
   }
   if (state.tab === 'log') loadLog()
   if (state.tab === 'review' && force) loadReview()
+  if (state.tab === 'spot' && force) loadSpot()
 }
 
 // Zip download: a menu of kinds and a button that starts the download.
@@ -331,6 +333,114 @@ async function loadReview() {
   })
 }
 
+// ------------------------------------------------------------ spot check ---
+// A seeded random sample of any requests, with filters, for a person to read
+// question and answer side by side and flag what looks wrong. Flags are kept
+// apart from the judged wrong-hit sample.
+const SPOT_FIELDS = ['kind', 'min', 'max', 'q', 'n', 'seed']
+function spotFilters() {
+  const f = $('#spot-form')
+  if (!f) return null
+  const v = Object.fromEntries(SPOT_FIELDS.map(k => [k, f[k].value]))
+  v.flagged = f.flagged.checked
+  return v
+}
+function applySpotFilters(v) {
+  const f = $('#spot-form')
+  if (!v || !f) return
+  for (const k of SPOT_FIELDS) if (v[k] !== undefined) f[k].value = v[k]
+  f.flagged.checked = Boolean(v.flagged)
+}
+
+const LABEL = { miss: 'miss', standard: 'standard hit', semantic: 'semantic hit', unknown: 'hit' }
+
+async function loadSpot({ newSeed = false } = {}) {
+  const id = state.selected
+  if (!id) return
+  const f = $('#spot-form')
+  if (newSeed) f.seed.value = ''
+  const v = spotFilters()
+  const qs = new URLSearchParams()
+  for (const k of SPOT_FIELDS) if (v[k] !== '') qs.set(k, v[k])
+  if (v.flagged) qs.set('flagged', '1')
+  $('#spot-head').textContent = 'Loading…'
+  // Only the latest request may render: an earlier, slower one is dropped.
+  const ticket = (state.spotTicket = (state.spotTicket ?? 0) + 1)
+  let d
+  try {
+    d = await api(`/runs/${id}/spot?${qs}`)
+  } catch (err) {
+    if (ticket !== state.spotTicket) return
+    $('#spot-head').textContent = `Could not load: ${err.message}`
+    $('#spot').replaceChildren()
+    return
+  }
+  if (ticket !== state.spotTicket || state.selected !== id) return
+  f.seed.value = d.seed
+  saveView()
+  const exp = d.expectedOutput
+  $('#spot-head').textContent =
+    `${fmt(d.items.length)} of ${fmt(d.matching)} matching requests (${fmt(d.total)} in the run) · seed ${d.seed}` +
+    ` · you have checked ${fmt(d.flags.checked)}, ${fmt(d.flags.wrong)} marked wrong.` +
+    (exp ? ` Expected output: ${exp[0]}–${exp[1]} tokens.` : '') +
+    ' These flags are listed in the report on their own, not in the wrong-hit rate.'
+  if (!d.items.length) {
+    $('#spot').replaceChildren(el('p', { className: 'meta', textContent: 'Nothing matches these filters.' }))
+    return
+  }
+  $('#spot').replaceChildren(...d.items.map(i => spotCard(id, i)))
+}
+
+function spotCard(id, i) {
+  const type = i.cache === 'MISS' ? 'miss' : i.hitType || 'unknown'
+  const meta = [
+    el('span', { className: `pill ${type === 'miss' ? 'idle' : type === 'semantic' ? 'semantic' : 'complete'}`, textContent: LABEL[type] }),
+    i.score !== null ? ` score ${i.score.toFixed(3)}` : '',
+    i.cache === 'MISS' && i.shadowScore !== null ? ` · closest cached ${i.shadowScore.toFixed(3)}` : '',
+    ` · ${fmt(i.inputTokens)} in / `,
+    el('span', { className: i.outputVsExpected && i.outputVsExpected !== 'within' ? 'out-off' : '', textContent: `${fmt(i.outputTokens)} out tokens` }),
+    i.outputVsExpected && i.outputVsExpected !== 'within' ? ` (${i.outputVsExpected} expected)` : '',
+    ` · ${fmt(i.latencyMs)} ms`,
+  ]
+  const card = el(
+    'div',
+    { className: 'rv spot-card', dataset: { flag: i.flag?.flag ?? '' } },
+    el('p', { className: 'q', textContent: `#${i.seq} · ${i.question}` }),
+    el('p', { className: 'mq' }, ...meta),
+    type === 'miss'
+      ? null
+      : i.matchedQuestion !== null
+        ? el('p', { className: 'mq', textContent: type === 'standard' ? `Same question as #${i.matchedSeq}; its stored answer was returned.` : `Cached answer was written for #${i.matchedSeq}: ${i.matchedQuestion}` })
+        : el('p', { className: 'mq', textContent: 'The request that stored this answer is not in the CSV (for example, a retried request whose first reply was cached but never received).' }),
+    el('pre', { className: 'answer', textContent: i.response || '(no response text)' }),
+  )
+  const note = el('input', { type: 'text', className: 'note', placeholder: 'note (optional)', value: i.flag?.note ?? '', maxLength: 2000 })
+  const row = el('div', { className: 'verdicts' }, el('span', { textContent: 'Looks:' }))
+  const save = async flag => {
+    try {
+      await api(`/runs/${id}/spot`, { method: 'PUT', body: { seq: i.seq, flag, note: note.value } })
+      i.flag = flag ? { flag, note: note.value } : null
+      card.dataset.flag = flag ?? ''
+      for (const b of $$('button', row)) b.setAttribute('aria-pressed', String(b.dataset.flag === flag))
+      const d = await api(`/runs/${id}/spot?n=1&kind=all`)
+      $('#spot-head').textContent = $('#spot-head').textContent.replace(/you have checked [\d,]+, [\d,]+ marked wrong/, `you have checked ${fmt(d.flags.checked)}, ${fmt(d.flags.wrong)} marked wrong`)
+    } catch (err) {
+      alert(err.message)
+    }
+  }
+  for (const [flag, label] of [['ok', 'ok'], ['wrong', 'wrong'], [null, 'clear']]) {
+    const b = el('button', { className: 'small', textContent: label, dataset: { flag: flag ?? '' } })
+    b.setAttribute('aria-pressed', String(flag !== null && i.flag?.flag === flag))
+    b.addEventListener('click', () => save(flag))
+    row.append(b)
+  }
+  // A note on an already flagged card saves when you leave the field.
+  note.addEventListener('change', () => i.flag && save(i.flag.flag))
+  row.append(note)
+  card.append(row)
+  return card
+}
+
 // ------------------------------------------------------------------ main ---
 async function refresh() {
   try {
@@ -354,6 +464,15 @@ function main() {
   loadView()
   for (const t of $$('.tabs button')) t.setAttribute('aria-selected', String(t.dataset.tab === state.tab))
   for (const p of $$('[data-panel]')) p.hidden = p.dataset.panel !== state.tab
+  applySpotFilters(state.spot)
+  $('#spot-form').addEventListener('submit', e => {
+    e.preventDefault()
+    loadSpot({ newSeed: true })
+  })
+  $('#spot-same').addEventListener('click', () => loadSpot())
+  $('#spot-form').addEventListener('change', e => {
+    if (e.target.name !== 'seed') saveView()
+  })
   $('#run-form').addEventListener('input', () => {
     updateEstimate()
     saveView()

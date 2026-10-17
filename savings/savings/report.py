@@ -309,6 +309,50 @@ def wrong_hit_summary(judged: list[dict]) -> dict:
     }
 
 
+def spot_check_summary(run_dir: Path, rows: list[dict]) -> dict | None:
+    """The person's spot-check flags (spotcheck.json), kept apart from measure 5.
+
+    Spot-check cards are drawn with filters a person chose, so they are not a
+    random sample of semantic hits; they never feed the wrong-hit rate.
+    """
+    path = run_dir / 'spotcheck.json'
+    if not path.exists():
+        return None
+    try:
+        flags = json.loads(path.read_text())
+    except ValueError:
+        return None
+    if not flags:
+        return None
+    by_seq = {r['seq']: r for r in rows}
+
+    def kind(r):
+        if not r:
+            return 'unknown'
+        return r['hit_type'] or ('miss' if r['cache'] == 'MISS' else 'unknown')
+
+    checked = {int(k): v for k, v in flags.items()}
+    wrong = {k: v for k, v in checked.items() if v.get('flag') == 'wrong'}
+    by_kind: dict[str, dict] = {}
+    for seq, f in checked.items():
+        k = kind(by_seq.get(seq))
+        d = by_kind.setdefault(k, {'checked': 0, 'wrong': 0})
+        d['checked'] += 1
+        d['wrong'] += f.get('flag') == 'wrong'
+    return {
+        'checked': len(checked),
+        'wrong': len(wrong),
+        'by_kind': by_kind,
+        'examples': [
+            {'seq': seq, 'kind': kind(by_seq.get(seq)),
+             'question': (by_seq.get(seq) or {}).get('question'),
+             'score': (by_seq.get(seq) or {}).get('gateway_score'),
+             'note': f.get('note', '')}
+            for seq, f in sorted(wrong.items())[:20]
+        ],
+    }
+
+
 def build(run_id: str, simulate: bool = True) -> dict:
     run_dir = RUNS_DIR / run_id
     meta = json.loads((run_dir / 'meta.json').read_text())
@@ -391,6 +435,7 @@ def build(run_id: str, simulate: bool = True) -> dict:
             'max': max(sem_scores) if sem_scores else None,
         },
         'wrong_hits': wrong_hit_summary(judged) if judged else None,
+        'spot_check': spot_check_summary(run_dir, rows),
     }
     (run_dir / 'report.json').write_text(json.dumps(rep, indent=2))
     (run_dir / 'report.md').write_text(render_md([rep]))
@@ -541,6 +586,14 @@ def render_md(reps: list[dict]) -> str:
                            f'"{e["matched_question"]}" (score {e["score"]}): {e["reason"]}')
         else:
             out.append('Not judged yet (`python -m savings judge`).')
+        sc = rep.get('spot_check')
+        if sc:
+            kinds = ', '.join(f'{k}: {v["wrong"]}/{v["checked"]}' for k, v in sc['by_kind'].items())
+            out += ['', '### Spot check (manual, not part of the wrong-hit rate)', '',
+                    f'{sc["wrong"]} of {sc["checked"]} checked requests marked wrong ({kinds}).']
+            for e in sc['examples']:
+                out.append(f'- #{e["seq"]} ({e["kind"]}) "{e["question"]}"'
+                           + (f': {e["note"]}' if e['note'] else ''))
         sim = rep.get('thresholds')
         if sim:
             last = list(sim['checkpoints'])[-1]
@@ -719,6 +772,18 @@ def _run_html(rep: dict) -> str:
     else:
         h.append('<p class="note">Not judged yet.</p>')
 
+    sc = rep.get('spot_check')
+    if sc:
+        kinds = '; '.join(f'{html.escape(k)} {v["wrong"]}/{v["checked"]}' for k, v in sc['by_kind'].items())
+        h.append('<h3>Spot check</h3><p class="note">Requests a person looked at in the Spot check tab, '
+                 'drawn with filters they chose. Not a random sample, so not part of the wrong-hit rate '
+                 'above.</p>')
+        h.append(f'<p>{sc["wrong"]} of {sc["checked"]} checked requests marked wrong ({kinds}).</p>')
+        if sc['examples']:
+            h.append('<ul class="ex">' + ''.join(
+                f'<li><b>#{e["seq"]}</b> ({html.escape(e["kind"])}) “{html.escape(str(e["question"]))}”'
+                + (f'. {html.escape(e["note"])}' if e['note'] else '') + '</li>'
+                for e in sc['examples']) + '</ul>')
     sim = rep.get('thresholds')
     if sim:
         cpk = list(sim['checkpoints'])

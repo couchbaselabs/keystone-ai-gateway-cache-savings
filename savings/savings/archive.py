@@ -18,7 +18,8 @@ from pathlib import Path
 
 from .config import RUNS_DIR
 
-SHARE_FILES = ['report.html', 'report.md', 'requests.csv', 'judge.jsonl', 'review.json', 'meta.json']
+SHARE_FILES = ['report.html', 'report.md', 'requests.csv', 'judge.jsonl', 'review.json', 'spotcheck.json',
+               'meta.json']
 VECTOR_FILES = {'embeds.f32', 'embeds.seqs', 'shadow.f32', 'shadow.seqs'}
 NEVER = {'job.json', 'requests.csv.tmp', 'progress.json.tmp'}
 
@@ -44,6 +45,8 @@ requests.csv  One row per request, the raw data for the pricing model. Key colum
                 matched_seq      the request whose cached answer a hit returned
 judge.jsonl   The sampled semantic hits with the judge model's verdict (if judged).
 review.json   Verdicts a person set on that sample, by request seq (if reviewed).
+spotcheck.json  Manual spot-check flags (ok / wrong, with notes) by request seq, from
+              filtered random samples; not part of the wrong-hit rate (if any).
 meta.json     Settings: models, threshold and expiry applied, dataset, timings.
 """
 

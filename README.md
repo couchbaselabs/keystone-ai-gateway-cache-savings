@@ -52,6 +52,17 @@ wrong-hit verdicts, your reviews, and the raw `requests.csv` with one row per re
 `response` text. Job history goes to `savings/runs/jobs.json`. Everything reloads after a restart, and
 the page remembers the selected run, tab and form values in the browser.
 
+**Spot check tab.** A seeded random sample of any requests, for reading each question beside its answer.
+- **Filters:** misses, standard or semantic hits, a score band (for example 0.75–0.80, just above the
+  threshold), or text in the question or answer.
+- **Cards:** each card shows the hit type and score, the question a hit's answer was written for,
+  tokens against the expected output length, and latency.
+- **Sets:** *Reload* draws a new set; *Same set* with a seed redraws an earlier one, so others can see
+  the same cards.
+- **Flags:** mark a card ok or wrong, with a note. Flags are saved in `spotcheck.json`. The report lists
+  them in their own section and never counts them in the wrong-hit rate, because a filtered sample isn't
+  random.
+
 **Saving or sharing a run.** In a run's panel, **Download zip** offers three kinds:
 - *to share*: report, `requests.csv`, the wrong-hit sample and review, settings and a README that
   explains the columns. About 4.5 MB for a 20,000-request chatbot run.
