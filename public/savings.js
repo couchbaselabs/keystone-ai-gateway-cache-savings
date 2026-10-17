@@ -3,7 +3,10 @@ const $$ = (sel, el = document) => [...el.querySelectorAll(sel)]
 
 function el(tag, attrs = {}, ...children) {
   const node = document.createElement(tag)
-  Object.assign(node, attrs)
+  // dataset is read-only as a property, so its entries are set one by one.
+  const { dataset, ...props } = attrs
+  Object.assign(node, props)
+  if (dataset) Object.assign(node.dataset, dataset)
   for (const c of children) if (c !== null && c !== undefined) node.append(c)
   return node
 }
@@ -189,6 +192,8 @@ function select(id) {
   saveView()
   renderRuns()
   renderDetail(true)
+  // Bring the run's panel into view; it sits below the runs table.
+  $('#detail').scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
 function actionButton(label, fn, { primary = false, danger = false, disabled = false } = {}) {
@@ -304,7 +309,7 @@ async function loadReview() {
       'div',
       { className: 'rv', dataset: { verdict: v } },
       el('p', { className: 'q', textContent: `#${i.seq} · ${i.question}` }),
-      el('p', { className: 'mq', textContent: `Cached answer was written for: ${i.matched_question} (score ${i.score ?? '—'})` }),
+      el('p', { className: 'mq', textContent: `Cached answer was written for: ${i.matched_question} (score ${i.score == null ? '—' : Number(i.score).toFixed(3)})` }),
       el('p', { className: 'reason' }, el('span', { className: `pill ${i.verdict}`, textContent: `judge: ${i.verdict}` }), ` ${i.reason ?? ''}`),
       el('details', {}, el('summary', { textContent: 'Answer served' }), el('pre', { textContent: i.answer })),
     )
