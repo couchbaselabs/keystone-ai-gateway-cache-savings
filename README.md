@@ -46,15 +46,27 @@ the harness embeds every request through `/v1/embeddings` with the cache's model
 cached match for every request and the embedding token count. The report then replays the cache at
 other thresholds from those vectors. It checks the replay, and the gateway's score scale, against the
 measured run. `savings/savings/report.py` and the report's Method section give the details.
-**What is saved, and where.** Preferences go to `.env` (not committed; it holds the API key). Claim
-results go to `results/claim-results.json`. Datasets are in `savings/data/` and runs in
-`savings/runs/<run-id>/`: settings, progress, report, wrong-hit verdicts and your reviews, plus the raw
-`requests.csv`, which has one row per request and includes the `response` text. Job history goes to
-`savings/runs/jobs.json`. Everything reloads after a restart. The page also remembers the selected run,
-the tab and the form values in the browser. `savings/.gitignore` keeps the large files out of git:
-`requests.csv`, `answers.jsonl`, the embedding logs and the RAG messages file. The RAG messages file
-rebuilds byte-for-byte, with no model calls, from the committed `capella-docs.jsonl` and
-`rag-questions.jsonl`.
+**What is saved, and where.** Preferences go to `.env` and claim results to `results/claim-results.json`.
+Datasets are in `savings/data/` and runs in `savings/runs/<run-id>/`: settings, progress, report,
+wrong-hit verdicts, your reviews, and the raw `requests.csv` with one row per request, including the
+`response` text. Job history goes to `savings/runs/jobs.json`. Everything reloads after a restart, and
+the page remembers the selected run, tab and form values in the browser.
+
+**Saving or sharing a run.** In a run's panel, **Download zip** offers three kinds:
+- *to share*: report, `requests.csv`, the wrong-hit sample and review, settings and a README that
+  explains the columns. About 4.5 MB for a 20,000-request chatbot run.
+- *full run*: everything needed to restore the run. Unzip it into `savings/runs/` and the page shows it
+  again; it can rebuild the report and resume. About 95 MB, most of it embedding logs.
+- *full run, no embedding logs*: the same without the embedding logs, about 7 MB. The report keeps its
+  threshold table, but the replay can't be recomputed and the run can't resume.
+
+The CLI does the same: `python -m savings zip --run ID --kind share|full [--no-vectors]`.
+
+**Run results are not committed.** `savings/runs/` is gitignored, because results feed pricing decisions
+and record gateway settings. To share a run, use the page's report (open it and save the HTML) and its
+CSV download, and send them privately, for example on Google Drive. The datasets are committed, except
+the Bitext download and the large RAG messages file. That file rebuilds byte-for-byte, with no model
+calls, from `capella-docs.jsonl` and `rag-questions.jsonl`.
 
 `npm run savings:test` runs the unit tests and `npm run savings:smoke` runs the page's API against the
 mock gateway.

@@ -171,3 +171,20 @@ def test_public_gateway_url_hides_deployment_hosts():
     assert public_gateway_url('http://127.0.0.1:18082') == 'http://127.0.0.1:18082'
     hidden = public_gateway_url('https://abc123.ai.sandbox.example.com')
     assert 'example' not in hidden and hidden.startswith('https://')
+
+
+def test_ensure_columns_reorders_csv_with_response(tmp_path):
+    run_dir = tmp_path / 'mid'
+    run_dir.mkdir()
+    old = [c for c in COLUMNS if c != 'response'] + ['response']  # previous order
+    with (run_dir / 'requests.csv').open('w', newline='') as f:
+        w = csv.DictWriter(f, fieldnames=old)
+        w.writeheader()
+        w.writerow({**{c: '' for c in old}, 'seq': 1, 'question': 'q?', 'response': 'a.', 'response_id': 'id1'})
+    assert ensure_response_column(run_dir) is True
+    with (run_dir / 'requests.csv').open(newline='') as f:
+        rd = csv.DictReader(f)
+        row = next(rd)
+        assert rd.fieldnames == COLUMNS
+    assert rd.fieldnames.index('response') == rd.fieldnames.index('question') + 1
+    assert (row['question'], row['response'], row['response_id']) == ('q?', 'a.', 'id1')

@@ -120,7 +120,8 @@ check(html.status === 200 && html.body.includes('Measures 1–4'), 'report.html 
 const csv = await call('/files/smoke/requests.csv')
 check(csv.status === 200 && csv.body.startsWith('seq,'), 'requests.csv served')
 const header = csv.body.split(/\r?\n/)[0].split(',')
-check(header.at(-1) === 'response' && csv.body.includes('Mock answer'), 'requests.csv has the response text')
+check(header[header.indexOf('question') + 1] === 'response' && header.at(-1) === 'response_id' && csv.body.includes('Mock answer'),
+  'requests.csv has the response text beside the question')
 check((await call('/files/smoke/..%2F..%2Fpackage.json')).status === 404, 'path traversal refused')
 check((await call('/summary', 'POST', { runs: ['smoke'] })).status === 200, 'summary started')
 const sum = await until(async () => ((await call('/state')).body.summary.exists ? true : null))
@@ -147,11 +148,25 @@ check(back?.summary.exists, 'after restart: summary still there')
 const rv2 = (await call('/runs/smoke/review')).body
 check(rv2.items.find(i => i.seq === seq)?.human === 'wrong', 'after restart: human verdict kept')
 
+// Zip downloads: share (report, CSV, README) and full (restorable, no job.json).
+const zipOf = async q => {
+  const res = await fetch(`${base}/runs/smoke/zip?${q}`)
+  const buf = Buffer.from(await res.arrayBuffer())
+  return { status: res.status, name: res.headers.get('content-disposition') ?? '', buf, text: buf.toString('latin1') }
+}
+const zs = await zipOf('kind=share')
+check(zs.status === 200 && zs.buf.subarray(0, 2).toString() === 'PK' && zs.name.includes('smoke-share.zip'), 'share zip downloads')
+check(['smoke/report.html', 'smoke/requests.csv', 'smoke/README.txt', 'smoke/judge.jsonl'].every(f => zs.text.includes(f)) && !zs.text.includes('smoke/embeds.f32'), 'share zip has report, CSV, README, judge; no vectors')
+const zf = await zipOf('kind=full&vectors=0')
+check(zf.status === 200 && zf.name.includes('smoke-full-no-vectors.zip') && zf.text.includes('smoke/meta.json') && !zf.text.includes('smoke/job.json') && !zf.text.includes('smoke/shadow.f32'), 'full zip without vectors: restorable files, no job.json')
+check((await fetch(`${base}/runs/nope/zip?kind=share`)).status === 404, 'zip of unknown run: 404')
+
 // Deleting a run: refused while it runs, then removes it and its files.
 const r2 = await call('/runs', 'POST', { workload: 'chatbot', model: 'sonnet', runId: 'smoke2', limit: 300, concurrency: 2 })
 check(r2.status === 200, 'second run started')
 await until(async () => (await call('/state')).body.runs.find(x => x.runId === 'smoke2')?.status === 'running', 15000)
 check((await call('/runs/smoke2', 'DELETE')).status === 409, 'delete refused while the run is running')
+check((await fetch(`${base}/runs/smoke2/zip?kind=full`)).status === 409, 'zip refused while the run is running')
 await until(async () => (await call('/state')).body.runs.find(x => x.runId === 'smoke2')?.status === 'complete')
 const del = await call('/runs/smoke2', 'DELETE')
 check(del.status === 200, 'finished run deleted')

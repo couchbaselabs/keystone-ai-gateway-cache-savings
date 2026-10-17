@@ -7,6 +7,7 @@
   summary   --runs ID,ID,...            one report across several runs
   status    --run ID                    print progress
   check                                 one request to confirm settings and headers
+  zip       --run ID --kind share|full  zip one run (full: restorable; share: for readers)
 """
 
 from __future__ import annotations
@@ -58,6 +59,12 @@ def main(argv: list[str] | None = None) -> int:
     st = sub.add_parser('status', help='print progress of a run')
     st.add_argument('--run', required=True)
 
+    zp = sub.add_parser('zip', help='zip one run for saving or sharing')
+    zp.add_argument('--run', required=True)
+    zp.add_argument('--kind', choices=['share', 'full'], default='full')
+    zp.add_argument('--no-vectors', action='store_true', help='full: leave out the embedding logs')
+    zp.add_argument('--out', default='', help='zip path (default: runs/<run>-<kind>.zip)')
+
     ck = sub.add_parser('check', help='one request to confirm the settings and headers')
     ck.add_argument('--model', default='haiku')
 
@@ -96,6 +103,13 @@ def main(argv: list[str] | None = None) -> int:
     elif a.cmd == 'status':
         p = RUNS_DIR / a.run / 'progress.json'
         print(p.read_text() if p.exists() else '{}')
+    elif a.cmd == 'zip':
+        from pathlib import Path
+
+        from .archive import build_zip, zip_name
+
+        out = Path(a.out) if a.out else RUNS_DIR / zip_name(a.run, a.kind, not a.no_vectors)
+        print(build_zip(a.run, a.kind, out, vectors=not a.no_vectors))
     elif a.cmd == 'check':
         return check(a.model)
     return 0

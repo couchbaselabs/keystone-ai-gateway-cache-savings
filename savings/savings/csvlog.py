@@ -1,5 +1,5 @@
-"""The per-request CSV: its columns, and the upgrade of runs written before a
-column existed.
+"""The per-request CSV: its columns, and the upgrade of runs written with an
+older column set or order.
 
 `response` holds the answer text the gateway returned (on a HIT, the cached
 answer). Runs recorded before that column existed have their answers only in
@@ -14,15 +14,17 @@ import os
 from pathlib import Path
 
 COLUMNS = [
-    'seq', 'started_at', 'vid', 'group', 'question',
+    'seq', 'started_at', 'vid', 'group', 'question', 'response',
     'cache', 'hit_type', 'gateway_score', 'shadow_score', 'shadow_match_seq',
     'matched_seq',
     'prompt_tokens', 'completion_tokens',
     'saved_input_tokens', 'saved_output_tokens',
     'billed_input_tokens', 'billed_output_tokens',
     'embed_tokens', 'latency_ms', 'embed_latency_ms',
-    'attempts', 'http_status', 'error', 'response_id',
-    'response',
+    'attempts', 'http_status', 'error',
+    # The gateway's response id. A HIT replays the id of the request that
+    # stored the answer, which is how matched_seq is found, also after resume.
+    'response_id',
 ]
 
 
@@ -68,19 +70,22 @@ def run_active(run_dir: Path) -> bool:
 
 
 def ensure_response_column(run_dir: Path, *, force: bool = False) -> bool:
-    """Add the `response` column to an older CSV. Returns True if it rewrote it.
+    """Bring an older CSV to the current columns and order. Returns True if it
+    rewrote it. Fills `response` from answers.jsonl when the column is missing.
 
     Skipped while the run is active, unless the caller is that run (force).
     """
     cols = header(run_dir)
-    if not cols or 'response' in cols:
+    if not cols or cols == COLUMNS:
         return False
     if not force and run_active(run_dir):
         return False
-    answers = read_answers(run_dir)
+    answers = read_answers(run_dir) if 'response' not in cols else {}
+    csv.field_size_limit(1 << 30)
     with (run_dir / 'requests.csv').open(newline='') as f:
         rows = list(csv.DictReader(f))
-    for r in rows:
-        r['response'] = '' if r.get('error') else answers.get(int(r['seq']), '')
+    if 'response' not in cols:
+        for r in rows:
+            r['response'] = '' if r.get('error') else answers.get(int(r['seq']), '')
     write_rows(run_dir, rows)
     return True

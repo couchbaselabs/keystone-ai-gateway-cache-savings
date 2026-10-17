@@ -220,6 +220,7 @@ function renderDetail(force = false) {
     actionButton(busy('report') ? 'Rebuilding…' : 'Rebuild report', () => api(`/runs/${r.runId}/report`, { method: 'POST' }), { disabled: busy('report') }),
     el('a', { className: 'button', href: `api/savings/files/${r.runId}/report.html`, target: '_blank', textContent: 'Report ↗' }),
     el('a', { className: 'button', href: `api/savings/files/${r.runId}/requests.csv`, textContent: 'CSV' }),
+    zipControl(r, running),
     actionButton('Delete run', () => deleteRun(r), { danger: true, disabled: running || busy('judge') || busy('report') }),
   ]
   $('#detail-actions').replaceChildren(...actions)
@@ -229,6 +230,42 @@ function renderDetail(force = false) {
   }
   if (state.tab === 'log') loadLog()
   if (state.tab === 'review' && force) loadReview()
+}
+
+// Zip download: a menu of kinds and a button that starts the download.
+function zipControl(r, running) {
+  const pick = el(
+    'select',
+    { className: 'small-select', ariaLabel: 'zip contents', disabled: running },
+    el('option', { value: 'kind=share', textContent: 'Zip to share (report, CSV, review)' }),
+    el('option', { value: 'kind=full', textContent: 'Zip full run (restorable)' }),
+    el('option', { value: 'kind=full&vectors=0', textContent: 'Zip full run, no embedding logs' }),
+  )
+  pick.value = state.zipKind ?? 'kind=share'
+  pick.addEventListener('change', () => (state.zipKind = pick.value))
+  const btn = el('button', { className: 'small', textContent: running ? 'Zip (after the run)' : 'Download zip', disabled: running })
+  btn.addEventListener('click', async () => {
+    btn.disabled = true
+    btn.textContent = 'Zipping…'
+    try {
+      // Fetch first so errors show as a message instead of a broken download.
+      const res = await fetch(`api/savings/runs/${r.runId}/zip?${pick.value}`)
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? `${res.status}`)
+      const blob = await res.blob()
+      const name = /filename="?([^";]+)"?/.exec(res.headers.get('content-disposition') ?? '')?.[1] ?? `${r.runId}.zip`
+      const a = el('a', { href: URL.createObjectURL(blob), download: name })
+      document.body.append(a)
+      a.click()
+      a.remove()
+      setTimeout(() => URL.revokeObjectURL(a.href), 60000)
+    } catch (err) {
+      alert(`Zip failed: ${err.message}`)
+    } finally {
+      btn.disabled = false
+      btn.textContent = 'Download zip'
+    }
+  })
+  return el('span', { className: 'zip-control' }, pick, btn)
 }
 
 async function deleteRun(r) {

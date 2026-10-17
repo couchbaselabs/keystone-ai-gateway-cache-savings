@@ -63,3 +63,6 @@
 }
 button.danger { color: var(--bad); border-color: var(--bad); }
 button.danger:disabled { color: var(--muted); border-color: var(--border); }
+.zip-control { display: inline-flex; gap: 4px; align-items: center; }
+.small-select { font: inherit; font-size: 13px; padding: 2px 6px; border: 1px solid var(--border);
+  border-radius: 6px; background: var(--surface); color: var(--text); max-width: 100%; }
