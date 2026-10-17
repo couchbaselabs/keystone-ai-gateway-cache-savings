@@ -11,6 +11,9 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
+# The title every page, report and zip README uses.
+TITLE = 'Serverless Model Service - Cache Savings Test Runs'
+
 SAVINGS_DIR = Path(__file__).resolve().parent.parent
 DEMO_DIR = SAVINGS_DIR.parent
 DATA_DIR = Path(os.environ.get('SAVINGS_DATA_DIR', SAVINGS_DIR / 'data'))

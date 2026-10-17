@@ -116,7 +116,7 @@ const rep = await until(async () => {
 })
 check(rep && rep.wrongHits.wrong >= 1, `report counts the human verdict: ${JSON.stringify(rep?.wrongHits)}`)
 const html = await call('/files/smoke/report.html')
-check(html.status === 200 && html.body.includes('Measures 1–4'), 'report.html served')
+check(html.status === 200 && html.body.includes('Measures 1–4') && html.body.includes('<h1>Serverless Model Service - Cache Savings Test Runs</h1>') && html.body.includes('Run smoke'), 'report.html served, with the common title')
 const csv = await call('/files/smoke/requests.csv')
 check(csv.status === 200 && csv.body.startsWith('seq,'), 'requests.csv served')
 const header = csv.body.split(/\r?\n/)[0].split(',')
@@ -127,7 +127,7 @@ check((await call('/summary', 'POST', { runs: ['smoke'] })).status === 200, 'sum
 const sum = await until(async () => ((await call('/state')).body.summary.exists ? true : null))
 check(sum, 'summary built')
 const sh = await call('/files/summary/summary.html')
-check(sh.status === 200 && sh.body.includes('Keystone cache savings test'), 'summary.html served')
+check(sh.status === 200 && sh.body.includes('<h1>Serverless Model Service - Cache Savings Test Runs</h1>') && sh.body.includes('Summary of 1 run'), 'summary.html served')
 // Restart the UI server: runs, reports, reviews and job history reload from disk.
 await new Promise(r => {
   procs[1].once('exit', r)

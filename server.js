@@ -76,7 +76,7 @@ function listen(port, triesLeft) {
   server.once('listening', () => {
     if (port !== config.port) console.log(`Port ${config.port} is busy; using ${port} instead.`)
     config.port = port
-    console.log(`Keystone AI Gateway cache savings on http://${config.host}:${port}`)
+    console.log(`Serverless Model Service - Cache Savings Test Runs on http://${config.host}:${port}`)
     console.log(`Gateway: ${config.gatewayUrl}  chat: ${config.chatModel}  embed: ${config.embedModel}`)
     if (!config.apiKey) console.log('GATEWAY_API_KEY is not set; set it in Preferences or .env.')
     openBrowser(`http://${config.host}:${port}/savings.html`)

@@ -16,14 +16,15 @@ import json
 import zipfile
 from pathlib import Path
 
-from .config import RUNS_DIR
+from .config import RUNS_DIR, TITLE
 
 SHARE_FILES = ['report.html', 'report.md', 'requests.csv', 'judge.jsonl', 'review.json', 'spotcheck.json',
                'meta.json']
 VECTOR_FILES = {'embeds.f32', 'embeds.seqs', 'shadow.f32', 'shadow.seqs'}
 NEVER = {'job.json', 'requests.csv.tmp', 'progress.json.tmp'}
 
-SHARE_README = """Keystone AI Gateway cache savings test: run {run_id}
+SHARE_README = """{title}
+Run {run_id}
 {workload} on {model}, {done:,} of {total:,} requests ({state}).
 
 report.html   The report: hit rates (standard / semantic), tokens saved per hit and
@@ -84,7 +85,7 @@ def build_zip(run_id: str, kind: str, out: Path, vectors: bool = True) -> Path:
             if (run_dir / 'progress.json').exists():
                 prog = json.loads((run_dir / 'progress.json').read_text())
             z.writestr(f'{run_id}/README.txt', SHARE_README.format(
-                run_id=run_id, workload=meta.get('workload'), model=meta.get('model'),
+                title=TITLE, run_id=run_id, workload=meta.get('workload'), model=meta.get('model'),
                 done=prog.get('done', 0), total=prog.get('total', 0),
                 state=prog.get('state', meta.get('status', 'unknown'))))
     tmp.replace(out)

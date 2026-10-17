@@ -1,4 +1,4 @@
-# Keystone AI Gateway cache savings
+# Serverless Model Service - Cache Savings Test Runs
 
 Measures what the semantic cache in the Keystone AI Gateway (Couchbase Capella Model Service) saves
 customers, and checks how the cache behaves against a live gateway. Two tools share one local web UI:
@@ -17,7 +17,7 @@ customers, and checks how the cache behaves against a live gateway. Two tools sh
 
 ## Cache savings test (`/savings.html`)
 
-The Keystone cache savings test: a 20,000-request stream per workload through the semantic cache, with
+The cache savings test requested for the Serverless Model Service: a 20,000-request stream per workload through the semantic cache, with
 hit rate, tokens saved, embedding tokens, latency p50/p95 and wrong hits at 1,000, 10,000 and 20,000
 requests, plus the raw per-request CSV.
 

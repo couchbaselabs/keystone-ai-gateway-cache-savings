@@ -46,6 +46,7 @@ header > div, .card-head > div { min-width: 0; }
 header { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
 h1 { font-size: 22px; margin: 0 0 4px; }
 .sub { color: var(--muted); margin: 0; max-width: 760px; }
+.kicker { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
 .config {
   margin-top: 16px;
   display: flex; flex-wrap: wrap; gap: 6px 18px;

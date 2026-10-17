@@ -26,7 +26,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .config import RUNS_DIR, price_for
+from .config import RUNS_DIR, TITLE, price_for
 from .csvlog import ensure_response_column
 from .shadow import VectorLog
 
@@ -439,7 +439,7 @@ def build(run_id: str, simulate: bool = True) -> dict:
     }
     (run_dir / 'report.json').write_text(json.dumps(rep, indent=2))
     (run_dir / 'report.md').write_text(render_md([rep]))
-    (run_dir / 'report.html').write_text(render_html([rep], title=f'Cache savings: {run_id}'))
+    (run_dir / 'report.html').write_text(render_html([rep], subtitle=f'Run {run_id}'))
     return rep
 
 
@@ -466,7 +466,8 @@ def build_summary(run_ids: list[str], out: Path | None = None) -> Path:
     out.mkdir(parents=True, exist_ok=True)
     (out / 'summary.json').write_text(json.dumps(reps, indent=2))
     (out / 'summary.md').write_text(render_md(reps))
-    (out / 'summary.html').write_text(render_html(reps, title='Keystone cache savings test'))
+    (out / 'summary.html').write_text(render_html(
+        reps, subtitle=f'Summary of {len(reps)} run' + ('s' if len(reps) != 1 else '')))
     return out
 
 
@@ -562,7 +563,7 @@ def settings_rows(rep: dict) -> list[tuple[str, str]]:
 
 
 def render_md(reps: list[dict]) -> str:
-    out = ['# Keystone cache savings test', '']
+    out = [f'# {TITLE}', '']
     for rep in reps:
         cps = list(rep['checkpoints'])
         out += [f'## {run_title(rep)}', '', f'Run `{rep["run_id"]}`', '']
@@ -663,7 +664,7 @@ font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
 main{max-width:1080px;margin:0 auto;padding:24px 16px 64px}
 h1{font-size:24px;margin:0 0 4px}h2{font-size:19px;margin:36px 0 8px;padding-top:12px;
 border-top:2px solid var(--accent)}h3{font-size:15px;margin:22px 0 6px}
-.sub{color:var(--muted);margin:0 0 16px}
+.sub{color:var(--muted);margin:0 0 16px}.kicker{font-size:16px;font-weight:600;margin:0 0 4px}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:12px 0}
 .tile{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
 .tile b{display:block;font-size:22px;font-variant-numeric:tabular-nums}.tile span{color:var(--muted);font-size:12px}
@@ -681,12 +682,14 @@ code{font-size:12px}
 """
 
 
-def render_html(reps: list[dict], title: str) -> str:
+def render_html(reps: list[dict], subtitle: str) -> str:
     parts = [f'<!doctype html><html lang="en"><head><meta charset="utf-8">'
              f'<meta name="viewport" content="width=device-width,initial-scale=1">'
-             f'<title>{html.escape(title)}</title><style>{CSS}</style></head><body><main>',
-             f'<h1>{html.escape(title)}</h1>',
-             f'<p class="sub">Semantic cache on the AI Gateway (Keystone). Checkpoints count requests '
+             f'<title>{html.escape(TITLE)} · {html.escape(subtitle)}</title><style>{CSS}</style></head>'
+             '<body><main>',
+             f'<h1>{html.escape(TITLE)}</h1>',
+             f'<p class="kicker">{html.escape(subtitle)}</p>',
+             f'<p class="sub">Semantic cache in the Serverless Model Service gateway. Checkpoints count requests '
              f'from the start of one stream inside one cache expiry window. Generated '
              f'{html.escape(reps[0]["generated_at"]) if reps else ""}.</p>']
     if len(reps) > 1:
